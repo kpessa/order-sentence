@@ -421,7 +421,7 @@ export function ExcelOrderSentenceTable({ rxcui, drugName, excelData }: ExcelOrd
 
   const currentNoResultsMessage = () => {
     if (noResultsAfterPanelFilters) {
-      return <p>No order sentences found for "{drugName}" after applying panel filters.</p>;
+      return <p>No order sentences found for &quot;{drugName}&quot; after applying panel filters.</p>;
     }
     if (noResultsAfterAllFilters) {
       return <p>No results match the current combined filter criteria (including column filters).</p>;

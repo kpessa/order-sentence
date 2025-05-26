@@ -421,6 +421,7 @@ export function ExcelOrderSentenceTable({ rxcui, drugName, excelData }: ExcelOrd
 
   const currentNoResultsMessage = () => {
     if (noResultsAfterPanelFilters) {
+      // eslint-disable-next-line react/no-unescaped-entities
       return <p>No order sentences found for "{drugName}" after applying panel filters.</p>;
     }
     if (noResultsAfterAllFilters) {

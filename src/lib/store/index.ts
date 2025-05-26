@@ -11,7 +11,7 @@ import excelDataReducer from './slices/excelDataSlice';
 const persistConfig = {
   key: 'root',
   version: 1,
-  storage: storage('orderSentenceAppDB'), // Name your IndexedDB database
+  storage: storage({ name: 'orderSentenceAppDB' }), // Pass an object with the db name
   whitelist: ['excelData'], // Only persist the excelData slice
 };
 
@@ -28,7 +28,13 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        // Ignore the excelData.data path for serializability checks
+        ignoredPaths: ['excelData.data'],
       },
+      // Configure immutableCheck to ignore the large excelData.data path
+      immutableCheck: {
+        ignoredPaths: ['excelData.data'],
+      }
     }),
 });
 

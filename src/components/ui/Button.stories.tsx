@@ -1,3 +1,4 @@
+// @ts-expect-error - Storybook types issue with React 19 or current setup
 import type { Meta, StoryObj } from '@storybook/react';
 import { Button } from '@/components/ui/button'; // Path alias should work now
 

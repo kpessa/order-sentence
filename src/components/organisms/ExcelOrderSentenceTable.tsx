@@ -409,6 +409,10 @@ export function ExcelOrderSentenceTable({ rxcui, drugName, excelData }: ExcelOrd
     console.log('[ExcelTable] Sorting state changed:', JSON.stringify(table.getState().sorting));
   }, [table.getState().sorting]);
 
+  useEffect(() => {
+    console.log(`[ExcelTable] Table row model updated. Final visible rows: ${table.getRowModel().rows.length}`);
+  }, [table.getRowModel().rows.length]);
+
   const noResultsAfterPanelFilters = 
     excelData.length > 0 &&
     dataForTable.length === 0 && // Check data *before* TanStack column filters
@@ -609,12 +613,12 @@ export function ExcelOrderSentenceTable({ rxcui, drugName, excelData }: ExcelOrd
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => table.setPageSize(dataForTable.length)}
+                onClick={() => table.setPageSize(table.getPrePaginationRowModel().rows.length)}
                 className="h-8 px-2 text-xs"
-                disabled={table.getState().pagination.pageSize === dataForTable.length || dataForTable.length === 0}
-                title="Show all rows"
+                disabled={table.getState().pagination.pageSize === table.getPrePaginationRowModel().rows.length || table.getPrePaginationRowModel().rows.length === 0}
+                title="Show all currently filtered rows"
               >
-                Show All ({dataForTable.length})
+                Show All ({table.getPrePaginationRowModel().rows.length})
               </Button>
             </div>
 

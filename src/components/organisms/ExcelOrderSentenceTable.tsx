@@ -11,82 +11,71 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import { CernerOrderSentence, OrderSentenceRow } from '@/lib/types';
+// import { CernerOrderSentence, OrderSentenceRow } from '@/lib/types'; // Keep if OrderSentenceRow is still used, or remove
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+
+// Assuming ExcelRow is defined in your hooks or types, or define it here
+interface ExcelRow {
+  [key: string]: any;
+}
 
 interface ExcelOrderSentenceTableProps {
   rxcui: string;
   drugName: string;
-  // We'll pass actual data later
-  // initialData?: CernerOrderSentence[];
+  excelData: ExcelRow[]; // Added excelData prop
 }
 
-// Mock data - this would eventually come from parsing an Excel/CSV file
-// and filtering by rxcui/drugName
-const MOCK_ORDER_SENTENCES: CernerOrderSentence[] = [
-  {
-    id: '1',
-    rxcui: '153165',
-    drugName: 'Atorvastatin',
-    originalOrderSentence: 'ATORVASTATIN 20 MG PO QDAY',
-    strength: '20 MG',
-    form: 'TABLET',
-    route: 'PO',
-    frequency: 'QDAY',
-    orderType: 'Scheduled',
-  },
-  {
-    id: '2',
-    rxcui: '153165',
-    drugName: 'Atorvastatin',
-    originalOrderSentence: 'ATORVASTATIN 40 MG PO HS',
-    strength: '40 MG',
-    form: 'TABLET',
-    route: 'PO',
-    frequency: 'HS',
-    orderType: 'Scheduled',
-  },
-  {
-    id: '3',
-    rxcui: '123',
-    drugName: 'Lisinopril',
-    originalOrderSentence: 'LISINOPRIL 10 MG PO DAILY',
-    strength: '10 MG',
-    form: 'TABLET',
-    route: 'PO',
-    frequency: 'DAILY',
-    orderType: 'Scheduled'
-  },
-  {
-    id: '4',
-    rxcui: '123',
-    drugName: 'Lisinopril',
-    originalOrderSentence: 'LISINOPRIL 5 MG PO BID PRN HTN',
-    strength: '5 MG',
-    form: 'TABLET',
-    route: 'PO',
-    frequency: 'BID',
-    orderType: 'PRN',
-  },
-];
-
-export function ExcelOrderSentenceTable({ rxcui, drugName }: ExcelOrderSentenceTableProps) {
+export function ExcelOrderSentenceTable({ rxcui, drugName, excelData }: ExcelOrderSentenceTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
 
-  const data = useMemo(() => 
-    MOCK_ORDER_SENTENCES.filter(sentence => sentence.rxcui === rxcui)
-  , [rxcui]);
+  const data = useMemo(() => {
+    console.log('[ExcelTable] Filtering data. Received drugName:', drugName);
+    console.log('[ExcelTable] Received excelData length:', excelData?.length);
 
-  const columns = useMemo<ColumnDef<CernerOrderSentence>[]>(() => [
-    { accessorKey: 'drugName', header: 'Drug Name' },
-    { accessorKey: 'strength', header: 'Strength' },
-    { accessorKey: 'form', header: 'Form' },
-    { accessorKey: 'route', header: 'Route' },
-    { accessorKey: 'frequency', header: 'Frequency' },
-    { accessorKey: 'orderType', header: 'Order Type' },
-    { accessorKey: 'originalOrderSentence', header: 'Order Sentence', cell: info => <span className="text-sm">{String(info.getValue())}</span> },
+    if (!excelData || !drugName || excelData.length === 0) {
+      console.log('[ExcelTable] excelData or drugName is missing or excelData is empty. Returning empty array.');
+      return [];
+    }
+    
+    const lowercasedDrugName = drugName.toLowerCase();
+    console.log('[ExcelTable] Lowercased drugName for filtering:', lowercasedDrugName);
+
+    // Log a few descriptions from the excelData before filtering
+    if (excelData.length > 0) {
+      console.log('[ExcelTable] Sample Descriptions from excelData (first 5 before filter):');
+      excelData.slice(0, 5).forEach((row, index) => {
+        console.log(`[ExcelTable] Row ${index} Description: '${String(row["Description"])}'`);
+      });
+    }
+    
+    const filteredData = excelData.filter(row => {
+      const description = String(row["Description"]); 
+      const lowercasedDescription = description.toLowerCase();
+      const isMatch = lowercasedDescription.includes(lowercasedDrugName);
+      // Optionally, log individual matches/non-matches for deep debugging, but can be very verbose
+      // if (isMatch) console.log(`[ExcelTable] Match found: Description '${description}' includes '${lowercasedDrugName}'`);
+      return isMatch;
+    });
+
+    console.log('[ExcelTable] Filtered data length:', filteredData.length);
+    if (filteredData.length === 0) {
+        console.log('[ExcelTable] No matches found after filtering. Check drugName and Description column contents.');
+    }
+    return filteredData;
+  }, [excelData, drugName]);
+
+  // IMPORTANT: Update these column definitions to match your Excel sheet headers (from row 2)
+  // The `accessorKey` should be the exact header name from your Excel file.
+  const columns = useMemo<ColumnDef<ExcelRow>[]>(() => [
+    { accessorKey: 'Catalog Type', header: 'Catalog Type' },
+    { accessorKey: 'Encounter Group', header: 'Encounter Group' },
+    { accessorKey: 'Description', header: 'Description' },
+    { accessorKey: 'Synonym', header: 'Synonym' },
+    { accessorKey: 'Synonym Type', header: 'Synonym Type' },
+    { accessorKey: 'Order Entry Format', header: 'Order Entry Format' },
+    { accessorKey: 'Sentence', header: 'Order Sentence', cell: info => <span className="text-sm">{String(info.getValue())}</span> },
   ], []);
 
   const table = useReactTable({
@@ -104,13 +93,13 @@ export function ExcelOrderSentenceTable({ rxcui, drugName }: ExcelOrderSentenceT
     getPaginationRowModel: getPaginationRowModel(),
     initialState: {
         pagination: {
-            pageSize: 5, // Default page size
+            pageSize: 10, // Default page size, can be adjusted
         }
     }
   });
 
   if (!data || data.length === 0) {
-    return <p>No order sentences found for {drugName} (RxCUI: {rxcui}). This might be mock data limitations.</p>;
+    return <p>No order sentences found matching "{drugName}" in the Description column of the Excel data.</p>;
   }
 
   return (

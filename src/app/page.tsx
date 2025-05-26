@@ -1,17 +1,15 @@
 'use client'; // Required for useState and event handlers
 
-import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { DrugAutocomplete } from '@/components/molecules/DrugAutocomplete';
 import { WorkflowSelector } from '@/components/molecules/WorkflowSelector';
 import { SelectedDrugInfo } from '@/lib/types';
+import { selectSelectedDrug } from '@/lib/store/slices/drugSearchSlice';
+import type { RootState } from '@/lib/store';
 
 export default function HomePage() {
-  const [selectedDrug, setSelectedDrug] = useState<SelectedDrugInfo | null>(null);
-
-  const handleDrugSelection = (drug: SelectedDrugInfo) => {
-    setSelectedDrug(drug);
-    console.log('Drug selected on HomePage:', drug);
-  };
+  // Get selectedDrug from the Redux store
+  const selectedDrug = useSelector((state: RootState) => selectSelectedDrug(state));
 
   return (
     <main className="container mx-auto p-4">
@@ -23,7 +21,7 @@ export default function HomePage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
         <section id="drug-search" className="p-6 bg-white shadow-lg rounded-lg">
           <h2 className="text-2xl font-semibold mb-5 text-blue-700 border-b pb-2">Step 1: Drug Search & Selection</h2>
-          <DrugAutocomplete onDrugSelected={handleDrugSelection} />
+          <DrugAutocomplete />
         </section>
 
         <section id="workflow-selection" className={`p-6 bg-white shadow-lg rounded-lg ${!selectedDrug ? 'opacity-50 cursor-not-allowed' : ''}`}>

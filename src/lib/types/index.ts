@@ -55,6 +55,7 @@ export interface RxNormSuggestion {
   tty: string;
   synonym?: string;
   score?: string; // Approximate match score
+  source?: string; // Added to store the source (e.g., MMSL, RXNORM)
 }
 
 export interface RxNormApproximateTermResponse {

@@ -1,10 +1,20 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Input } from '@/components/ui/input';
-import { SelectedDrugInfo, RxNormSuggestion } from '@/lib/types';
+import { RxNormSuggestion, SelectedDrugInfo } from '@/lib/types';
+import {
+  updateQuery,
+  fetchDrugResults,
+  selectDrug as selectDrugAction, // Rename to avoid conflict with local variable
+  incrementRetry,
+  setStatus as setStatusAction, // Rename to avoid conflict
+} from '@/lib/store/slices/drugSearchSlice';
+import type { AppDispatch, RootState } from '@/lib/store';
+import { getSourceInfo } from '@/lib/utils/sourceMappings';
 
-// Debounce function
+// Debounce function (can be moved to a utils file)
 const debounce = <F extends (...args: any[]) => any>(
   func: F,
   delay: number
@@ -17,106 +27,103 @@ const debounce = <F extends (...args: any[]) => any>(
 };
 
 interface DrugAutocompleteProps {
-  onDrugSelected?: (drug: SelectedDrugInfo) => void;
+  onDrugSelected?: (drug: SelectedDrugInfo) => void; // This can still be used for local component events if needed
 }
 
 export function DrugAutocomplete({ onDrugSelected }: DrugAutocompleteProps) {
-  const [query, setQuery] = useState('');
-  const [suggestions, setSuggestions] = useState<RxNormSuggestion[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
 
-  // Mock RxNorm API call
-  const fetchSuggestions = async (searchTerm: string): Promise<RxNormSuggestion[]> => {
-    console.log(`Fetching suggestions for: ${searchTerm}`);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
+  const query = useSelector((state: RootState) => state.drugSearch.query);
+  const suggestions = useSelector((state: RootState) => state.drugSearch.results);
+  const status = useSelector((state: RootState) => state.drugSearch.status);
+  const error = useSelector((state: RootState) => state.drugSearch.error);
+  const retries = useSelector((state: RootState) => state.drugSearch.retries);
+  const maxRetries = useSelector((state: RootState) => state.drugSearch.maxRetries);
 
-    if (searchTerm.toLowerCase() === 'error') {
-        throw new Error("Simulated API error");
-    }
-
-    // TTY: IN=Ingredient, PIN=Precise Ingredient, MIN=Multiple Ingredients, BN=Brand Name
-    const mockData: RxNormSuggestion[] = [
-      { rxcui: '123', name: 'Lisinopril', tty: 'IN' },
-      { rxcui: '456', name: 'Lisinopril 10mg tablet', tty: 'SCD' }, // Specific Clinical Drug
-      { rxcui: '789', name: 'Amlodipine', tty: 'IN' },
-      { rxcui: '101', name: 'Amoxicillin', tty: 'IN' },
-      { rxcui: '112', name: 'Metformin', tty: 'PIN' },
-      { rxcui: '8602' /* Lipitor */, name: 'Lipitor', tty: 'BN'},
-      { rxcui: '153165' /* atorvastatin */, name: 'Atorvastatin', tty: 'IN'},
-    ];
-
-    return mockData.filter(drug => 
-        drug.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ).filter(drug => ['IN', 'PIN', 'MIN'].includes(drug.tty)); // Prioritize ingredients
-  };
-
-  const debouncedFetchSuggestions = useCallback(
-    debounce(async (searchTerm: string) => {
-      if (searchTerm.length < 2) {
-        setSuggestions([]);
-        return;
+  const debouncedFetch = useCallback(
+    debounce((searchTerm: string) => {
+      if (searchTerm.length >= 2) {
+        dispatch(fetchDrugResults(searchTerm));
+      } else {
+        // Clear suggestions if query is too short, or let slice handle it
+        // dispatch(setStatusAction('idle')); // Optionally reset status
       }
-      setIsLoading(true);
-      setError(null);
-      try {
-        const results = await fetchSuggestions(searchTerm);
-        setSuggestions(results);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Failed to fetch suggestions');
-        setSuggestions([]);
-      }
-      setIsLoading(false);
     }, 300),
-    []
+    [dispatch]
   );
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
-    setQuery(value);
-    debouncedFetchSuggestions(value);
+    dispatch(updateQuery(value));
+    if (value.length >= 2) {
+        debouncedFetch(value);
+    } else if (value.length === 0) {
+        // If query is empty, clear suggestions/status (updateQuery in slice already does this)
+        // dispatch(setStatusAction('idle'));
+    }
   };
 
   const handleSelectSuggestion = (suggestion: RxNormSuggestion) => {
-    setQuery(suggestion.name);
-    setSuggestions([]);
-    const selectedDrug: SelectedDrugInfo = {
+    dispatch(selectDrugAction(suggestion)); // This updates the Redux store
+    // The onDrugSelected prop is now optional, main state is in Redux
+    // If the parent still needs to know specifically for *this* component instance interaction:
+    if (onDrugSelected) {
+      const selectedDrugInfo: SelectedDrugInfo = {
         name: suggestion.name,
         rxcui: suggestion.rxcui,
         tty: suggestion.tty,
-        isIngredient: ['IN', 'PIN', 'MIN'].includes(suggestion.tty)
-    };
-    console.log('Drug selected:', selectedDrug);
-    if (onDrugSelected) {
-      onDrugSelected(selectedDrug);
+        isIngredient: ['IN', 'PIN', 'MIN'].includes(suggestion.tty),
+      };
+      onDrugSelected(selectedDrugInfo);
     }
   };
+
+  // Optional: Handle retry logic if desired from the component
+  // useEffect(() => {
+  //   if (status === 'failed' && error && error.includes('retryneeded') && retries < maxRetries) {
+  //     // dispatch(incrementRetry());
+  //     // dispatch(setStatusAction('retrying')); // Update UI to show retrying
+  //     // setTimeout(() => dispatch(fetchDrugResults(query)), 1000); // Delay before retry
+  //   }
+  // }, [status, error, retries, maxRetries, query, dispatch]);
 
   return (
     <div className="relative w-full max-w-md mx-auto">
       <Input
         type="text"
-        value={query}
+        value={query} // Controlled by Redux state
         onChange={handleInputChange}
         placeholder="Enter medication name (min 2 chars)"
         className="w-full pr-10"
       />
-      {isLoading && <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs">Loading...</div>}
+      {status === 'loading' && <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs">Loading...</div>}
+      {status === 'retrying' && <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs">Retrying...</div>}
       
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      {status === 'failed' && error && <p className="text-red-500 text-sm mt-1">{error}</p>}
 
-      {suggestions.length > 0 && (
+      {/* Suggestions are now pre-filtered by the thunk to be ingredients only */}
+      {suggestions.length > 0 && status === 'succeeded' && (
         <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 shadow-lg max-h-60 overflow-y-auto">
-          {suggestions.map((suggestion) => (
-            <li
-              key={suggestion.rxcui}
-              onClick={() => handleSelectSuggestion(suggestion)}
-              className="p-2 hover:bg-gray-100 cursor-pointer"
-            >
-              {suggestion.name} ({suggestion.tty})
-            </li>
-          ))}
+          {suggestions // No longer need to filter here, as thunk provides only ingredients
+            .map((suggestion) => {
+              const sourceInfo = getSourceInfo(suggestion.source);
+              return (
+                <li
+                  key={`${suggestion.rxcui}-${suggestion.source}`}
+                  onClick={() => handleSelectSuggestion(suggestion)}
+                  className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200 flex justify-between items-center"
+                >
+                  <div>{suggestion.name} ({suggestion.tty})</div>
+                  {suggestion.source && (
+                    <span 
+                      className={`px-2.5 py-0.5 text-xs font-semibold rounded-full opacity-85 ${sourceInfo.colorClasses}`}
+                    >
+                      {sourceInfo.fullName}
+                    </span>
+                  )}
+                </li>
+              );
+            })}
         </ul>
       )}
     </div>

@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DrugAutocomplete } from '@/components/molecules/DrugAutocomplete';
 import { getColumnStyles, ColumnStyling } from '@/lib/utils/columnStyles';
 import { cn } from '@/lib/utils';
 
@@ -123,10 +122,6 @@ export function FilterPanel(props: FilterPanelProps) {
 
   return (
     <div className="w-full lg:w-72 xl:w-80 p-4 border rounded-lg shadow-lg lg:sticky lg:top-4 h-fit space-y-1 bg-white dark:bg-slate-900">
-      <FilterSection title="Selected Drug" columnName="Default" initiallyOpen>
-        <DrugAutocomplete />
-      </FilterSection>
-
       <FilterSection title="Description Filters" columnName="Description">
         {top5UniqueDescriptions.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">

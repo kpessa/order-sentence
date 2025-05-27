@@ -28,9 +28,10 @@ const debounce = <F extends (...args: any[]) => any>(
 
 interface DrugAutocompleteProps {
   onDrugSelected?: (drug: SelectedDrugInfo) => void; // This can still be used for local component events if needed
+  onSelectionComplete?: () => void; // New prop
 }
 
-export function DrugAutocomplete({ onDrugSelected }: DrugAutocompleteProps) {
+export function DrugAutocomplete({ onDrugSelected, onSelectionComplete }: DrugAutocompleteProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const query = useSelector((state: RootState) => state.drugSearch.query);
@@ -60,13 +61,12 @@ export function DrugAutocomplete({ onDrugSelected }: DrugAutocompleteProps) {
     } else if (value.length === 0) {
         // If query is empty, clear suggestions/status (updateQuery in slice already does this)
         // dispatch(setStatusAction('idle'));
+        if (onSelectionComplete) onSelectionComplete(); // Call if input is cleared
     }
   };
 
   const handleSelectSuggestion = (suggestion: RxNormSuggestion) => {
     dispatch(selectDrugAction(suggestion)); // This updates the Redux store
-    // The onDrugSelected prop is now optional, main state is in Redux
-    // If the parent still needs to know specifically for *this* component instance interaction:
     if (onDrugSelected) {
       const selectedDrugInfo: SelectedDrugInfo = {
         name: suggestion.name,
@@ -76,6 +76,7 @@ export function DrugAutocomplete({ onDrugSelected }: DrugAutocompleteProps) {
       };
       onDrugSelected(selectedDrugInfo);
     }
+    if (onSelectionComplete) onSelectionComplete(); // Call after selection
   };
 
   // Optional: Handle retry logic if desired from the component
@@ -93,6 +94,11 @@ export function DrugAutocomplete({ onDrugSelected }: DrugAutocompleteProps) {
         type="text"
         value={query} // Controlled by Redux state
         onChange={handleInputChange}
+        onBlur={() => { // Call onBlur if no selection was made but focus is lost
+          if (suggestions.length === 0 && onSelectionComplete) {
+            onSelectionComplete();
+          }
+        }}
         placeholder="Enter medication name (min 2 chars)"
         className="w-full pr-10"
       />

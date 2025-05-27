@@ -6,13 +6,14 @@ import { WorkflowSelector } from '@/components/molecules/WorkflowSelector';
 import { SelectedDrugInfo } from '@/lib/types';
 import { selectSelectedDrug } from '@/lib/store/slices/drugSearchSlice';
 import type { RootState } from '@/lib/store';
+import { OpenFdaResultsDisplay } from '@/components/organisms/OpenFdaResultsDisplay/OpenFdaResultsDisplay';
 
 export default function HomePage() {
   // Get selectedDrug from the Redux store
   const selectedDrug = useSelector((state: RootState) => selectSelectedDrug(state));
 
   return (
-    <main className="container mx-auto p-4">
+    <main className="mx-auto p-4 md:p-8">
       <header className="mb-10">
         <h1 className="text-4xl font-bold mb-2 text-center text-gray-800">Comprehensive Drug Analysis</h1>
         <p className="text-lg text-gray-600 text-center">Search for medications and explore detailed information workflows.</p>
@@ -43,6 +44,11 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Display OpenFDA results in its own full-width section */}
+      <section className="w-full mt-8">
+        <OpenFdaResultsDisplay />
+      </section>
 
       {/* <DebugPanel /> */}
     </main>

@@ -4,6 +4,7 @@ import storage from 'redux-persist-indexeddb-storage';
 
 import drugSearchReducer from './slices/drugSearchSlice';
 import excelDataReducer from './slices/excelDataSlice';
+import fdaDataReducer from './slices/fdaDataSlice';
 
 // We will import and add reducers here later
 // import drugSearchReducer from './slices/drugSearchSlice';
@@ -12,12 +13,13 @@ const persistConfig = {
   key: 'root',
   version: 1,
   storage: storage({ name: 'orderSentenceAppDB' }), // Pass an object with the db name
-  whitelist: ['excelData'], // Only persist the excelData slice
+  whitelist: ['excelData', 'drugSearch', 'fdaData'], // Only persist the excelData slice
 };
 
 const rootReducer = combineReducers({
   drugSearch: drugSearchReducer,
   excelData: excelDataReducer,
+  fdaData: fdaDataReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

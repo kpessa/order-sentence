@@ -10,6 +10,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState, AppDispatch } from '@/lib/store';
 import { fetchExcelData, selectAllExcelData, selectExcelDataLoading, selectExcelDataError } from '@/lib/store/slices/excelDataSlice';
 import { selectSelectedDrug } from '@/lib/store/slices/drugSearchSlice';
+import { DrugAutocomplete } from '@/components/molecules/DrugAutocomplete';
+import { PencilIcon } from 'lucide-react';
 
 function ExcelViewerContent() {
     const router = useRouter();
@@ -22,6 +24,8 @@ function ExcelViewerContent() {
     const excelLoadingStatus = useSelector(selectExcelDataLoading);
     const excelError = useSelector(selectExcelDataError);
     const selectedDrugFromStore = useSelector(selectSelectedDrug);
+
+    const [isEditingDrug, setIsEditingDrug] = React.useState(false);
 
     console.log('[ExcelViewerContent] Component render/re-render.');
     console.log('[ExcelViewerContent] excelLoadingStatus from store:', excelLoadingStatus);
@@ -85,7 +89,28 @@ function ExcelViewerContent() {
         <div>
             <header className="mb-6">
                 <h1 className="text-3xl font-bold text-gray-800">Cerner Order Sentences</h1>
-                <p className="text-xl text-gray-600">For: <span className="font-semibold">{decodedDrugNameFromUrl}</span> (RxCUI: {rxcuiFromUrl})</p>
+                {isEditingDrug ? (
+                    <div className="mt-2">
+                        <DrugAutocomplete 
+                            onSelectionComplete={() => setIsEditingDrug(false)} 
+                        />
+                    </div>
+                ) : (
+                    <div className="flex items-center mt-1">
+                        <p className="text-xl text-gray-600">
+                            For: <span className="font-semibold">{decodedDrugNameFromUrl}</span> (RxCUI: {rxcuiFromUrl})
+                        </p>
+                        <Button 
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsEditingDrug(true)}
+                            className="ml-2 h-7 w-7"
+                            title="Change drug"
+                        >
+                            <PencilIcon className="h-4 w-4 text-gray-500" />
+                        </Button>
+                    </div>
+                )}
             </header>
             
             <ExcelOrderSentenceTable rxcui={rxcuiFromUrl} drugName={decodedDrugNameFromUrl} excelData={excelData} />

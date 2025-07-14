@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   ColumnDef,
   flexRender,
@@ -123,7 +123,7 @@ const smartIncludesFilter: FilterFn<ExcelRowWithParsed> = (
 };
 
 export function ExcelOrderSentenceTable({
-  _rxcui,
+  rxcui,
   drugName,
   excelData,
 }: ExcelOrderSentenceTableProps) {
@@ -322,7 +322,7 @@ export function ExcelOrderSentenceTable({
 
   // Step 5: Apply PARSED header pill filters (if in parsed mode)
   // Currently not used as header pill filters are handled by ColumnHeaderFilterPopover
-  // const _fullyFilteredData = useMemo(() => {
+  const _fullyFilteredData = useMemo(() => {
     if (displayMode !== 'parsed') return dataAfterParsedPanelFilters; // Which is baseParsedDataForMode for raw mode
 
     let result = dataAfterParsedPanelFilters;
@@ -330,8 +330,8 @@ export function ExcelOrderSentenceTable({
     console.log(
       `[ExcelTable] Step 5 (parsed header pills): ${result.length} rows. FINAL for table.`
     );
-  //   return result;
-  // }, [dataAfterParsedPanelFilters, displayMode]);
+    return result;
+  }, [dataAfterParsedPanelFilters, displayMode]);
 
   // --- Unique Value Calculations (adjust based on new data flow) ---
   const PILL_LIMIT = 5;

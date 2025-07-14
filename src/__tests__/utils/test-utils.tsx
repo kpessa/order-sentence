@@ -1,10 +1,10 @@
-import React, { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
-import { Provider } from 'react-redux'
-import { configureStore, combineReducers } from '@reduxjs/toolkit'
-import drugSearchReducer from '@/lib/store/slices/drugSearchSlice'
-import excelDataReducer from '@/lib/store/slices/excelDataSlice'
-import fdaDataReducer from '@/lib/store/slices/fdaDataSlice'
+import React, { ReactElement } from 'react';
+import { render, RenderOptions } from '@testing-library/react';
+import { Provider } from 'react-redux';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import drugSearchReducer from '@/lib/store/slices/drugSearchSlice';
+import excelDataReducer from '@/lib/store/slices/excelDataSlice';
+import fdaDataReducer from '@/lib/store/slices/fdaDataSlice';
 // import { store } from '@/lib/store'
 // import type { RootState } from '@/lib/store'
 
@@ -13,7 +13,7 @@ const rootReducer = combineReducers({
   drugSearch: drugSearchReducer,
   excelData: excelDataReducer,
   fdaData: fdaDataReducer,
-})
+});
 
 // Helper function to create test store
 function createTestStore(preloadedState?: any) {
@@ -27,21 +27,21 @@ function createTestStore(preloadedState?: any) {
           ignoredPaths: ['excelData.data'],
         },
       }),
-  })
+  });
 }
 
 // Define test store type
-type TestStore = ReturnType<typeof createTestStore>
+type TestStore = ReturnType<typeof createTestStore>;
 
 // Define test state type based on the root reducer
-type TestState = ReturnType<typeof rootReducer>
+type TestState = ReturnType<typeof rootReducer>;
 
 // This type interface extends the default options for render from RTL, as well
 // as allows the user to specify other things such as initialState, store.
 interface ExtendedRenderOptions extends Omit<RenderOptions, 'wrapper'> {
-  preloadedState?: Partial<TestState>
+  preloadedState?: Partial<TestState>;
   // Automatically create a store instance if no store was passed in
-  store?: TestStore
+  store?: TestStore;
 }
 
 export function renderWithProviders(
@@ -53,17 +53,17 @@ export function renderWithProviders(
     // Automatically create a store instance if no store was passed in
     store = createTestStore(preloadedState),
     ...renderOptions
-  } = extendedRenderOptions
+  } = extendedRenderOptions;
 
   const Wrapper = ({ children }: { children: React.ReactNode }) => (
     <Provider store={store}>{children}</Provider>
-  )
+  );
 
   // Return an object with the store and all of RTL's query functions
   return {
     store,
     ...render(ui, { wrapper: Wrapper, ...renderOptions }),
-  }
+  };
 }
 
 // Mock data helpers
@@ -87,22 +87,22 @@ export const mockDrugSearchState = {
   ],
   isLoading: false,
   error: null,
-}
+};
 
 export const mockExcelDataState = {
   data: [
     {
       'Order Id': '123456',
       'Drug Name': 'Lisinopril',
-      'Dose': '10 mg',
-      'Route': 'PO',
-      'Frequency': 'Daily',
+      Dose: '10 mg',
+      Route: 'PO',
+      Frequency: 'Daily',
     },
   ],
   fileName: 'test-orders.xlsx',
   isLoading: false,
   error: null,
-}
+};
 
 export const mockFdaDataState = {
   openFdaResults: [
@@ -137,7 +137,7 @@ export const mockFdaDataState = {
   ],
   isLoading: false,
   error: null,
-}
+};
 
 // API response mocks
 export const mockRxNormResponse = {
@@ -155,7 +155,7 @@ export const mockRxNormResponse = {
       },
     ],
   },
-}
+};
 
 export const mockOpenFdaResponse = {
   results: [
@@ -170,7 +170,7 @@ export const mockOpenFdaResponse = {
       manufacturer_name: ['Test Manufacturer'],
     },
   ],
-}
+};
 
 export const mockDailyMedResponse = `
 <?xml version="1.0" encoding="UTF-8"?>
@@ -184,18 +184,18 @@ export const mockDailyMedResponse = `
     </section>
   </component>
 </document>
-`
+`;
 
 // Custom matchers
 declare global {
   namespace jest {
     interface Matchers<R> {
-      toBeInTheDocument(): R
-      toHaveClass(className: string): R
-      toHaveTextContent(text: string): R
+      toBeInTheDocument(): R;
+      toHaveClass(className: string): R;
+      toHaveTextContent(text: string): R;
     }
   }
 }
 
-export * from '@testing-library/react'
-export { renderWithProviders as render }
+export * from '@testing-library/react';
+export { renderWithProviders as render };

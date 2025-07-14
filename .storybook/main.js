@@ -3,17 +3,17 @@ const path = require('path');
 /** @type { import('@storybook/nextjs').StorybookConfig } */
 const config = {
   stories: [
-    "../src/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../src/components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../src/components/atoms/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../src/components/molecules/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../src/components/organisms/**/*.stories.@(js|jsx|mjs|ts|tsx)",
-    "../src/components/templates/**/*.stories.@(js|jsx|mjs|ts|tsx)",
+    '../src/stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/components/ui/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/components/atoms/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/components/molecules/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/components/organisms/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../src/components/templates/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "@storybook/addon-interactions",
+    '@storybook/addon-links',
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
     {
       name: '@storybook/addon-styling-webpack',
       options: {
@@ -23,18 +23,18 @@ const config = {
     },
   ],
   framework: {
-    name: "@storybook/nextjs",
+    name: '@storybook/nextjs',
     options: {},
   },
   docs: {
-    autodocs: "tag",
+    autodocs: 'tag',
   },
-  staticDirs: ["../public"],
+  staticDirs: ['../public'],
   webpackFinal: async (config) => {
     if (config.resolve) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@': path.resolve(__dirname, "../src/"),
+        '@': path.resolve(__dirname, '../src/'),
       };
     }
     return config;

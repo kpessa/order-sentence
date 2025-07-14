@@ -54,10 +54,10 @@ interface RxNormApiResponse {
 // RxNorm API response structures
 interface RxNormApproximateCandidate {
   rxcui: string;
-  score: string; 
-  rank: string;  
-  name?: string; 
-  tty?: string; 
+  score: string;
+  rank: string;
+  name?: string;
+  tty?: string;
   source?: string; // Added source from RxNorm API
 }
 interface RxNormApproximateGroup {
@@ -86,71 +86,100 @@ export const fetchDrugResults = createAsyncThunk<
   RxNormSuggestion[], // Return type of the payload
   string, // Argument type (search query)
   { rejectValue: string; state: { drugSearch: DrugSearchReduxState } } // ThunkAPI config
->(
-  'drugSearch/fetchResults',
-  async (query, { getState, rejectWithValue }) => {
-    const INGREDIENT_TTYS = ['IN', 'MIN', 'PIN'];
-    const MAX_SECONDARY_TTY_FETCHES_CANDIDATES = 5; // Consider top N candidates for secondary fetch if no TTY
+>('drugSearch/fetchResults', async (query, { rejectWithValue }) => {
+  const INGREDIENT_TTYS = ['IN', 'MIN', 'PIN'];
+  const MAX_SECONDARY_TTY_FETCHES_CANDIDATES = 5; // Consider top N candidates for secondary fetch if no TTY
 
-    console.log('Fetching RxNorm approximate terms for:', query);
-    const approximateTermUrl = API_ENDPOINTS.RXNORM.APPROXIMATE_TERM(query);
-    logApiCall(approximateTermUrl);
+  console.log('Fetching RxNorm approximate terms for:', query);
+  const approximateTermUrl = API_ENDPOINTS.RXNORM.APPROXIMATE_TERM(query);
+  logApiCall(approximateTermUrl);
 
-    try {
-      const initialResponse = await fetch(approximateTermUrl);
-      if (!initialResponse.ok) {
-        console.error(`RxNorm API (approximateTerm) request failed: ${initialResponse.status} ${initialResponse.statusText}`);
-        throw new Error(`RxNorm API (approximateTerm) request failed with status: ${initialResponse.status}`);
-      }
+  try {
+    const initialResponse = await fetch(approximateTermUrl);
+    if (!initialResponse.ok) {
+      console.error(
+        `RxNorm API (approximateTerm) request failed: ${initialResponse.status} ${initialResponse.statusText}`
+      );
+      throw new Error(
+        `RxNorm API (approximateTerm) request failed with status: ${initialResponse.status}`
+      );
+    }
 
-      const initialData: RxNormApproximateTermResponse = await initialResponse.json();
-      // console.log('Raw RxNorm API (approximateTerm) response:', JSON.stringify(initialData, null, 2));
+    const initialData: RxNormApproximateTermResponse =
+      await initialResponse.json();
+    // console.log('Raw RxNorm API (approximateTerm) response:', JSON.stringify(initialData, null, 2));
 
-      const suggestionPromises: Promise<RxNormSuggestion | null>[] = [];
+    const suggestionPromises: Promise<RxNormSuggestion | null>[] = [];
 
-      if (initialData.approximateGroup && initialData.approximateGroup.candidate) {
-        const candidates = initialData.approximateGroup.candidate;
-        let secondaryFetchesInitiated = 0;
+    if (
+      initialData.approximateGroup &&
+      initialData.approximateGroup.candidate
+    ) {
+      const candidates = initialData.approximateGroup.candidate;
+      let secondaryFetchesInitiated = 0;
 
-        for (let i = 0; i < candidates.length; i++) {
-          const cand = candidates[i];
-          // If cand.name is missing, but it's an exact match candidate for TTY fetch, we'll use the query as name later
-          // So, only continue if cand.name is missing AND it's not an exact match for TTY fetch
-          if (!cand.name && !(cand.rxcui && query.toLowerCase() === (cand.name || query).toLowerCase() && !cand.tty)) {
-             console.log(`Skipping candidate without name or not eligible for TTY fetch: ${JSON.stringify(cand)}`); // Kept for now
-             continue;
-          }
+      for (let i = 0; i < candidates.length; i++) {
+        const cand = candidates[i];
+        // If cand.name is missing, but it's an exact match candidate for TTY fetch, we'll use the query as name later
+        // So, only continue if cand.name is missing AND it's not an exact match for TTY fetch
+        if (
+          !cand.name &&
+          !(
+            cand.rxcui &&
+            query.toLowerCase() === (cand.name || query).toLowerCase() &&
+            !cand.tty
+          )
+        ) {
+          console.log(
+            `Skipping candidate without name or not eligible for TTY fetch: ${JSON.stringify(cand)}`
+          ); // Kept for now
+          continue;
+        }
 
-          const candidateName = cand.name || query; // Use query as name if cand.name is not present
+        const candidateName = cand.name || query; // Use query as name if cand.name is not present
 
-          if (cand.tty && INGREDIENT_TTYS.includes(cand.tty)) {
-            suggestionPromises.push(Promise.resolve({
+        if (cand.tty && INGREDIENT_TTYS.includes(cand.tty)) {
+          suggestionPromises.push(
+            Promise.resolve({
               rxcui: cand.rxcui,
               name: candidateName, // Use candidateName
               tty: cand.tty,
               synonym: '',
               score: cand.score,
               source: cand.source,
-            }));
-          } else if (!cand.tty && candidateName.toLowerCase() === query.toLowerCase() && secondaryFetchesInitiated < MAX_SECONDARY_TTY_FETCHES_CANDIDATES) {
-            secondaryFetchesInitiated++;
-            // console.log(`Creating promise to fetch TTY for candidate ${cand.rxcui} (${candidateName}) (exact match without TTY). Source: ${cand.source}`);
-            
-            const fetchTtyPromise = async (): Promise<RxNormSuggestion | null> => {
-              const ttyUrl = API_ENDPOINTS.RXNORM.RXCUI_PROPERTY(cand.rxcui, 'TTY');
-          logApiCall(ttyUrl);
+            })
+          );
+        } else if (
+          !cand.tty &&
+          candidateName.toLowerCase() === query.toLowerCase() &&
+          secondaryFetchesInitiated < MAX_SECONDARY_TTY_FETCHES_CANDIDATES
+        ) {
+          secondaryFetchesInitiated++;
+          // console.log(`Creating promise to fetch TTY for candidate ${cand.rxcui} (${candidateName}) (exact match without TTY). Source: ${cand.source}`);
+
+          const fetchTtyPromise =
+            async (): Promise<RxNormSuggestion | null> => {
+              const ttyUrl = API_ENDPOINTS.RXNORM.RXCUI_PROPERTY(
+                cand.rxcui,
+                'TTY'
+              );
+              logApiCall(ttyUrl);
               try {
                 const ttyResponse = await fetch(ttyUrl);
                 // console.log(`TTY fetch for ${cand.rxcui} (${candidateName}) - Status: ${ttyResponse.status}`);
 
                 if (ttyResponse.ok) {
-                  const ttyData: RxNormPropertyResponse = await ttyResponse.json();
+                  const ttyData: RxNormPropertyResponse =
+                    await ttyResponse.json();
                   // console.log(`TTY data for ${cand.rxcui} (${candidateName}):`, JSON.stringify(ttyData, null, 2));
 
-                  if (ttyData.propConceptGroup && 
-                      ttyData.propConceptGroup.propConcept && 
-                      ttyData.propConceptGroup.propConcept.length > 0) {
-                    const fetchedTty = ttyData.propConceptGroup.propConcept[0].propValue;
+                  if (
+                    ttyData.propConceptGroup &&
+                    ttyData.propConceptGroup.propConcept &&
+                    ttyData.propConceptGroup.propConcept.length > 0
+                  ) {
+                    const fetchedTty =
+                      ttyData.propConceptGroup.propConcept[0].propValue;
                     // console.log(`Fetched TTY for ${cand.rxcui} (${candidateName}): ${fetchedTty}`);
                     if (INGREDIENT_TTYS.includes(fetchedTty)) {
                       return {
@@ -158,64 +187,78 @@ export const fetchDrugResults = createAsyncThunk<
                         name: candidateName, // Use candidateName here
                         tty: fetchedTty,
                         synonym: '',
-                        score: cand.score, 
+                        score: cand.score,
                         source: cand.source,
                       };
                     }
                   } else {
-                     // console.log(`No TTY property found in expected structure for ${cand.rxcui} (${candidateName}). Actual data logged above.`);
+                    // console.log(`No TTY property found in expected structure for ${cand.rxcui} (${candidateName}). Actual data logged above.`);
                   }
                 } else {
                   // Log if response not OK
-                  console.warn(`TTY fetch for ${cand.rxcui} (${candidateName}) failed. Status: ${ttyResponse.status}, Text: ${await ttyResponse.text().catch(() => 'Could not get text')}`);
+                  console.warn(
+                    `TTY fetch for ${cand.rxcui} (${candidateName}) failed. Status: ${ttyResponse.status}, Text: ${await ttyResponse.text().catch(() => 'Could not get text')}`
+                  );
                 }
               } catch (ttyErr) {
-                console.warn(`Error during TTY fetch for ${cand.rxcui} (${candidateName}):`, ttyErr);
+                console.warn(
+                  `Error during TTY fetch for ${cand.rxcui} (${candidateName}):`,
+                  ttyErr
+                );
               }
               return null; // Return null if TTY not found or not an ingredient
             };
-            suggestionPromises.push(fetchTtyPromise());
-          }
-          // Optionally, add a small delay here if concerned about rate limiting secondary fetches, e.g., await new Promise(r => setTimeout(r, 50));
+          suggestionPromises.push(fetchTtyPromise());
         }
-      } else {
-        console.log('No approximateGroup or candidates found in API response');
+        // Optionally, add a small delay here if concerned about rate limiting secondary fetches, e.g., await new Promise(r => setTimeout(r, 50));
       }
-
-      const resolvedSuggestionsWithNulls = await Promise.all(suggestionPromises);
-      const processedSuggestions = resolvedSuggestionsWithNulls.filter(s => s !== null) as RxNormSuggestion[];
-      
-      // console.log('Processed suggestions (after ALL TTY fetches) before de-duplication:', JSON.stringify(processedSuggestions, null, 2));
-
-      // De-duplicate based on rxcui and source, keeping the first one encountered (which might have a name if others didn't)
-      const uniqueSuggestionsMap = new Map<string, RxNormSuggestion>();
-      for (const suggestion of processedSuggestions) {
-        const key = `${suggestion.rxcui}-${suggestion.source}`;
-        if (!uniqueSuggestionsMap.has(key)) {
-          uniqueSuggestionsMap.set(key, suggestion);
-        }
-      }
-      const deDupedSuggestions = Array.from(uniqueSuggestionsMap.values());
-
-      console.log('De-duplicated suggestions before sort/slice:', JSON.stringify(deDupedSuggestions, null, 2));
-
-      deDupedSuggestions.sort((a, b) => {
-        if (a.score && b.score && a.score !== b.score) {
-          const scoreA = parseFloat(a.score || '0');
-          const scoreB = parseFloat(b.score || '0');
-          return scoreB - scoreA; 
-        }
-        return a.name!.localeCompare(b.name!);
-      });
-
-      return deDupedSuggestions.slice(0, 15);
-
-    } catch (err: any) {
-      const errorInfo = handleApiError(err, 'RxNorm API call (hybrid approach with Promise.all)');
-      return rejectWithValue(errorInfo.message || 'Failed to fetch drug suggestions from RxNorm (hybrid approach)');
+    } else {
+      console.log('No approximateGroup or candidates found in API response');
     }
+
+    const resolvedSuggestionsWithNulls = await Promise.all(suggestionPromises);
+    const processedSuggestions = resolvedSuggestionsWithNulls.filter(
+      (s) => s !== null
+    ) as RxNormSuggestion[];
+
+    // console.log('Processed suggestions (after ALL TTY fetches) before de-duplication:', JSON.stringify(processedSuggestions, null, 2));
+
+    // De-duplicate based on rxcui and source, keeping the first one encountered (which might have a name if others didn't)
+    const uniqueSuggestionsMap = new Map<string, RxNormSuggestion>();
+    for (const suggestion of processedSuggestions) {
+      const key = `${suggestion.rxcui}-${suggestion.source}`;
+      if (!uniqueSuggestionsMap.has(key)) {
+        uniqueSuggestionsMap.set(key, suggestion);
+      }
+    }
+    const deDupedSuggestions = Array.from(uniqueSuggestionsMap.values());
+
+    console.log(
+      'De-duplicated suggestions before sort/slice:',
+      JSON.stringify(deDupedSuggestions, null, 2)
+    );
+
+    deDupedSuggestions.sort((a, b) => {
+      if (a.score && b.score && a.score !== b.score) {
+        const scoreA = parseFloat(a.score || '0');
+        const scoreB = parseFloat(b.score || '0');
+        return scoreB - scoreA;
+      }
+      return a.name!.localeCompare(b.name!);
+    });
+
+    return deDupedSuggestions.slice(0, 15);
+  } catch (err: any) {
+    const errorInfo = handleApiError(
+      err,
+      'RxNorm API call (hybrid approach with Promise.all)'
+    );
+    return rejectWithValue(
+      errorInfo.message ||
+        'Failed to fetch drug suggestions from RxNorm (hybrid approach)'
+    );
   }
-);
+});
 
 const drugSearchSlice = createSlice({
   name: 'drugSearch',
@@ -253,9 +296,12 @@ const drugSearchSlice = createSlice({
     incrementRetry: (state) => {
       state.retries += 1;
     },
-    setStatus: (state, action: PayloadAction<DrugSearchReduxState['status']>) => {
+    setStatus: (
+      state,
+      action: PayloadAction<DrugSearchReduxState['status']>
+    ) => {
       state.status = action.payload;
-    }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -264,11 +310,14 @@ const drugSearchSlice = createSlice({
         state.error = null;
         state.lastSearchTimestamp = Date.now();
       })
-      .addCase(fetchDrugResults.fulfilled, (state, action: PayloadAction<RxNormSuggestion[]>) => {
-        state.status = 'succeeded';
-        state.results = action.payload;
-        state.retries = 0; // Reset retries on success
-      })
+      .addCase(
+        fetchDrugResults.fulfilled,
+        (state, action: PayloadAction<RxNormSuggestion[]>) => {
+          state.status = 'succeeded';
+          state.results = action.payload;
+          state.retries = 0; // Reset retries on success
+        }
+      )
       .addCase(fetchDrugResults.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload as string; // Or action.error.message if not using rejectWithValue
@@ -283,15 +332,21 @@ export const {
   selectDrug,
   resetSearchState,
   incrementRetry,
-  setStatus
+  setStatus,
 } = drugSearchSlice.actions;
 
 // Selectors
-export const selectDrugSearchQuery = (state: RootState) => state.drugSearch.query;
-export const selectDrugSearchResults = (state: RootState) => state.drugSearch.results;
-export const selectSelectedDrug = (state: RootState) => state.drugSearch.selectedDrug;
-export const selectDrugSearchStatus = (state: RootState) => state.drugSearch.status;
-export const selectDrugSearchError = (state: RootState) => state.drugSearch.error;
-export const selectDrugSearchRetries = (state: RootState) => state.drugSearch.retries;
+export const selectDrugSearchQuery = (state: RootState) =>
+  state.drugSearch.query;
+export const selectDrugSearchResults = (state: RootState) =>
+  state.drugSearch.results;
+export const selectSelectedDrug = (state: RootState) =>
+  state.drugSearch.selectedDrug;
+export const selectDrugSearchStatus = (state: RootState) =>
+  state.drugSearch.status;
+export const selectDrugSearchError = (state: RootState) =>
+  state.drugSearch.error;
+export const selectDrugSearchRetries = (state: RootState) =>
+  state.drugSearch.retries;
 
-export default drugSearchSlice.reducer; 
+export default drugSearchSlice.reducer;

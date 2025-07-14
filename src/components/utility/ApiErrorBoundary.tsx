@@ -16,7 +16,11 @@ interface ApiErrorBoundaryProps {
  * Specialized Error Boundary for API-related errors
  * Provides specific messaging and retry functionality for API failures
  */
-export function ApiErrorBoundary({ children, apiName = 'API', onRetry }: ApiErrorBoundaryProps) {
+export function ApiErrorBoundary({
+  children,
+  apiName = 'API',
+  onRetry,
+}: ApiErrorBoundaryProps) {
   const handleError = (error: Error) => {
     // Log API-specific error details
     console.error(`[ApiErrorBoundary - ${apiName}]`, {
@@ -31,13 +35,14 @@ export function ApiErrorBoundary({ children, apiName = 'API', onRetry }: ApiErro
   const ApiErrorFallback = () => (
     <div className="flex items-center justify-center p-6 min-h-[200px]">
       <div className="max-w-md w-full space-y-4">
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="">
           <AlertCircle className="h-4 w-4" />
           <div className="space-y-3">
             <div>
               <h3 className="font-semibold">Unable to load data</h3>
               <p className="text-sm text-muted-foreground mt-1">
-                There was a problem connecting to the {apiName} service. This might be due to:
+                There was a problem connecting to the {apiName} service. This
+                might be due to:
               </p>
               <ul className="text-sm text-muted-foreground mt-2 ml-4 list-disc space-y-1">
                 <li>Network connectivity issues</li>
@@ -48,9 +53,9 @@ export function ApiErrorBoundary({ children, apiName = 'API', onRetry }: ApiErro
 
             <div className="flex gap-2 pt-2">
               {onRetry && (
-                <Button 
+                <Button
                   onClick={onRetry}
-                  variant="outline" 
+                  variant="outline"
                   size="sm"
                   className="flex items-center gap-2"
                 >
@@ -58,10 +63,11 @@ export function ApiErrorBoundary({ children, apiName = 'API', onRetry }: ApiErro
                   Retry
                 </Button>
               )}
-              <Button 
+              <Button
                 onClick={() => window.location.reload()}
-                variant="secondary" 
+                variant="secondary"
                 size="sm"
+                className=""
               >
                 Refresh Page
               </Button>

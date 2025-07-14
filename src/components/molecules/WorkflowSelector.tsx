@@ -30,18 +30,26 @@ export function WorkflowSelector({ selectedDrug }: WorkflowSelectorProps) {
 
     if (workflow === 'cerner') {
       // Pass drug info via query params or context/state management
-      router.push(`/excel-viewer?rxcui=${selectedDrug.rxcui}&name=${encodeURIComponent(selectedDrug.name)}`);
+      router.push(
+        `/excel-viewer?rxcui=${selectedDrug.rxcui}&name=${encodeURIComponent(selectedDrug.name)}`
+      );
     } else if (workflow === 'openfda') {
-      router.push(`/drug-details?rxcui=${selectedDrug.rxcui}&name=${encodeURIComponent(selectedDrug.name)}`);
+      router.push(
+        `/drug-details?rxcui=${selectedDrug.rxcui}&name=${encodeURIComponent(selectedDrug.name)}`
+      );
     }
   };
 
   const handleFetchOpenFdaData = () => {
     if (selectedDrug && selectedDrug.name) {
       dispatch(fetchOpenFdaDataByDrugName(selectedDrug.name));
-      console.log(`Dispatching fetchOpenFdaDataByDrugName for: ${selectedDrug.name}`);
+      console.log(
+        `Dispatching fetchOpenFdaDataByDrugName for: ${selectedDrug.name}`
+      );
     } else {
-      console.warn("No drug selected or drug name missing, cannot fetch FDA data.");
+      console.warn(
+        'No drug selected or drug name missing, cannot fetch FDA data.'
+      );
     }
   };
 
@@ -70,8 +78,12 @@ export function WorkflowSelector({ selectedDrug }: WorkflowSelectorProps) {
         onClick={handleFetchOpenFdaData}
         disabled={!selectedDrug || !selectedDrug.name}
         variant={selectedDrug && selectedDrug.name ? 'default' : 'secondary'}
-        title={!selectedDrug || !selectedDrug.name ? "Please select a drug first" : "Fetch package inserts from openFDA using the drug name"}
+        title={
+          !selectedDrug || !selectedDrug.name
+            ? 'Please select a drug first'
+            : 'Fetch package inserts from openFDA using the drug name'
+        }
       />
     </div>
   );
-} 
+}

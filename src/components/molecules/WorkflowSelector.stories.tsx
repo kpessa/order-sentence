@@ -1,9 +1,6 @@
 // @ts-expect-error - Storybook types issue with React 19 or current setup
 import type { Meta, StoryObj } from '@storybook/react';
 import { WorkflowSelector } from '@/components/molecules/WorkflowSelector';
-import type { ComponentProps } from 'react';
-// @ts-expect-error - Storybook types issue with React 19 or current setup
-import { fn } from '@storybook/test';
 
 const meta: Meta<typeof WorkflowSelector> = {
   title: 'Molecules/WorkflowSelector',
@@ -34,4 +31,4 @@ export const WithDrugSelected: StoryObj<typeof WorkflowSelector> = {
       isIngredient: false,
     },
   },
-}; 
+};

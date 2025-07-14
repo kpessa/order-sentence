@@ -13,7 +13,14 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+      options: [
+        'default',
+        'destructive',
+        'outline',
+        'secondary',
+        'ghost',
+        'link',
+      ],
     },
     size: {
       control: 'select',
@@ -99,4 +106,4 @@ export const Icon: StoryObj<typeof Button> = {
 //     asChild: true,
 //     children: <a href="#">Link Button</a>, // Storybook might not render NextLink directly well
 //   },
-// }; 
+// };

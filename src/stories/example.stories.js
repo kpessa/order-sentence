@@ -1,9 +1,11 @@
 import { CustomButton } from '../components/atoms/CustomButton/CustomButton';
 
-export default {
+const meta = {
   title: 'Example/CustomButton',
   component: CustomButton,
 };
+
+export default meta;
 
 export const Example = {
   args: {

@@ -11,10 +11,12 @@ export interface ParsedOrderSentence {
 
 /**
  * Parses a Cerner Order Sentence string into its components.
- * Example: "400 mg, Oral, Tab, One Time" -> 
+ * Example: "400 mg, Oral, Tab, One Time" ->
  * { DOSE: "400", DOSE_UOM: "mg", RXROUTE: "Oral", DOSE_FORM: "Tab", FREQUENCY: "One Time" }
  */
-export function parseOrderSentence(sentence: string | undefined | null): ParsedOrderSentence {
+export function parseOrderSentence(
+  sentence: string | undefined | null
+): ParsedOrderSentence {
   if (!sentence || typeof sentence !== 'string') {
     // console.log('[parseOrderSentence] Input is null, undefined, or not a string:', sentence);
     return {};
@@ -22,7 +24,10 @@ export function parseOrderSentence(sentence: string | undefined | null): ParsedO
   // console.log('[parseOrderSentence] Attempting to parse:', sentence);
 
   const parsed: ParsedOrderSentence = {};
-  const originalParts = sentence.split(',').map(part => part.trim()).filter(part => part.length > 0);
+  const originalParts = sentence
+    .split(',')
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
   let parts = [...originalParts]; // Work with a mutable copy for processing
 
   // console.log('[parseOrderSentence] Initial parts:', parts);
@@ -46,7 +51,7 @@ export function parseOrderSentence(sentence: string | undefined | null): ParsedO
       // console.log(`[parseOrderSentence] Matched DOSE: "${parsed.DOSE}", UOM: "${parsed.DOSE_UOM}" from part: "${part}"`);
       parts.splice(i, 1); // Remove the processed part
       foundDoseUOM = true;
-      break; 
+      break;
     }
   }
   if (!foundDoseUOM) {
@@ -76,38 +81,41 @@ export function parseOrderSentence(sentence: string | undefined | null): ParsedO
   const prnMatch = remainingSentenceStr.match(prnRegex);
 
   if (prnMatch) {
-    parsed.PRN = "PRN";
+    parsed.PRN = 'PRN';
     // console.log('[parseOrderSentence] Found PRN.');
     const prnIndex = prnMatch.index!;
-    const afterPrnStr = remainingSentenceStr.substring(prnIndex + "PRN".length).trim();
-    
+    const afterPrnStr = remainingSentenceStr
+      .substring(prnIndex + 'PRN'.length)
+      .trim();
+
     // Extract PRN_REASON (text after "PRN" and optional comma/space)
     let prnReasonCandidate = afterPrnStr;
     if (prnReasonCandidate.startsWith(',')) {
       prnReasonCandidate = prnReasonCandidate.substring(1).trim();
     }
     if (prnReasonCandidate) {
-        parsed.PRN_REASON = prnReasonCandidate; 
-        // console.log(`[parseOrderSentence] Assigned PRN_REASON: "${parsed.PRN_REASON}"`);
+      parsed.PRN_REASON = prnReasonCandidate;
+      // console.log(`[parseOrderSentence] Assigned PRN_REASON: "${parsed.PRN_REASON}"`);
     }
 
     // Assign FREQUENCY to be the part before PRN
     const beforePrnStr = remainingSentenceStr.substring(0, prnIndex).trim();
     if (beforePrnStr.endsWith(',')) {
-      parsed.FREQUENCY = beforePrnStr.substring(0, beforePrnStr.length - 1).trim();
+      parsed.FREQUENCY = beforePrnStr
+        .substring(0, beforePrnStr.length - 1)
+        .trim();
     } else {
       parsed.FREQUENCY = beforePrnStr;
     }
     // console.log(`[parseOrderSentence] Assigned FREQUENCY (with PRN): "${parsed.FREQUENCY}"`);
-
   } else {
     // No PRN found, the rest is FREQUENCY
     parsed.FREQUENCY = remainingSentenceStr;
     // console.log(`[parseOrderSentence] No PRN found. Assigned FREQUENCY: "${parsed.FREQUENCY}"`);
   }
-  
+
   // Final check for empty strings and convert to undefined if so
-  (Object.keys(parsed) as Array<keyof ParsedOrderSentence>).forEach(key => {
+  (Object.keys(parsed) as Array<keyof ParsedOrderSentence>).forEach((key) => {
     if (parsed[key] === '') {
       parsed[key] = undefined;
     }
@@ -127,5 +135,5 @@ export function parseOrderSentence(sentence: string | undefined | null): ParsedO
 // Output: { DOSE: "10", DOSE_UOM: "mg/kg", RXROUTE: "IV", DOSE_FORM: "Soln", FREQUENCY: "BID" }
 
 // const sentence3 = "Apply to affected area(s), Topical, Cream, Daily for 7 days";
-// console.log(parseOrderSentence(sentence3)); 
-// This will likely parse poorly with current logic, highlighting need for refinement. 
+// console.log(parseOrderSentence(sentence3));
+// This will likely parse poorly with current logic, highlighting need for refinement.

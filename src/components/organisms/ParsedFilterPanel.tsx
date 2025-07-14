@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { FilterSection } from './FilterPanel'; // Assuming FilterSection can be reused
-import { PillButton } from './FilterPanel';   // Assuming PillButton can be reused
+import { PillButton } from './FilterPanel'; // Assuming PillButton can be reused
 import { Input } from '@/components/ui/input'; // For potential search inputs
 import { getColumnStyles } from '@/lib/utils/columnStyles';
 
@@ -29,9 +29,8 @@ export function ParsedFilterPanel({
   onPanelSelectedFormChange,
   uniquePanelForms,
 }: ParsedFilterPanelProps) {
-  
   const routeStyles = getColumnStyles('Default'); // Or define specific 'Route' styles
-  const formStyles = getColumnStyles('Default');  // Or define specific 'Form' styles
+  const formStyles = getColumnStyles('Default'); // Or define specific 'Form' styles
 
   return (
     <div className="w-full lg:w-72 xl:w-80 p-4 border rounded-lg shadow-lg lg:sticky lg:top-4 h-fit space-y-6 bg-white dark:bg-slate-900">
@@ -40,7 +39,7 @@ export function ParsedFilterPanel({
       {/* <FilterSection title="Selected Drug" initiallyOpen>
         <DrugAutocomplete />
       </FilterSection> */}
-      
+
       <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 border-b pb-2">
         Filter Parsed Sentences
       </h2>
@@ -65,7 +64,11 @@ export function ParsedFilterPanel({
               className="w-full justify-start"
             />
           ))}
-          {uniquePanelRoutes.length === 0 && <p className="text-xs text-gray-500 dark:text-gray-400">No routes to filter.</p>}
+          {uniquePanelRoutes.length === 0 && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              No routes to filter.
+            </p>
+          )}
         </div>
       </FilterSection>
 
@@ -89,7 +92,11 @@ export function ParsedFilterPanel({
               className="w-full justify-start"
             />
           ))}
-          {uniquePanelForms.length === 0 && <p className="text-xs text-gray-500 dark:text-gray-400">No forms to filter.</p>}
+          {uniquePanelForms.length === 0 && (
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              No forms to filter.
+            </p>
+          )}
         </div>
       </FilterSection>
 
@@ -107,4 +114,4 @@ export function ParsedFilterPanel({
       */}
     </div>
   );
-} 
+}

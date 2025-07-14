@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Input } from '@/components/ui/input';
 import { RxNormSuggestion, SelectedDrugInfo } from '@/lib/types';
@@ -8,8 +8,6 @@ import {
   updateQuery,
   fetchDrugResults,
   selectDrug as selectDrugAction, // Rename to avoid conflict with local variable
-  incrementRetry,
-  setStatus as setStatusAction, // Rename to avoid conflict
 } from '@/lib/store/slices/drugSearchSlice';
 import type { AppDispatch, RootState } from '@/lib/store';
 import { getSourceInfo } from '@/lib/utils/sourceMappings';
@@ -31,25 +29,31 @@ interface DrugAutocompleteProps {
   onSelectionComplete?: () => void; // New prop
 }
 
-export function DrugAutocomplete({ onDrugSelected, onSelectionComplete }: DrugAutocompleteProps) {
+export function DrugAutocomplete({
+  onDrugSelected,
+  onSelectionComplete,
+}: DrugAutocompleteProps) {
   const dispatch = useDispatch<AppDispatch>();
 
   const query = useSelector((state: RootState) => state.drugSearch.query);
-  const suggestions = useSelector((state: RootState) => state.drugSearch.results);
+  const suggestions = useSelector(
+    (state: RootState) => state.drugSearch.results
+  );
   const status = useSelector((state: RootState) => state.drugSearch.status);
   const error = useSelector((state: RootState) => state.drugSearch.error);
-  const retries = useSelector((state: RootState) => state.drugSearch.retries);
-  const maxRetries = useSelector((state: RootState) => state.drugSearch.maxRetries);
 
   const debouncedFetch = useCallback(
-    debounce((searchTerm: string) => {
-      if (searchTerm.length >= 2) {
-        dispatch(fetchDrugResults(searchTerm));
-      } else {
-        // Clear suggestions if query is too short, or let slice handle it
-        // dispatch(setStatusAction('idle')); // Optionally reset status
-      }
-    }, 300),
+    (searchTerm: string) => {
+      const debouncedFn = debounce(() => {
+        if (searchTerm.length >= 2) {
+          dispatch(fetchDrugResults(searchTerm));
+        } else {
+          // Clear suggestions if query is too short, or let slice handle it
+          // dispatch(setStatusAction('idle')); // Optionally reset status
+        }
+      }, 300);
+      debouncedFn();
+    },
     [dispatch]
   );
 
@@ -57,11 +61,11 @@ export function DrugAutocomplete({ onDrugSelected, onSelectionComplete }: DrugAu
     const value = event.target.value;
     dispatch(updateQuery(value));
     if (value.length >= 2) {
-        debouncedFetch(value);
+      debouncedFetch(value);
     } else if (value.length === 0) {
-        // If query is empty, clear suggestions/status (updateQuery in slice already does this)
-        // dispatch(setStatusAction('idle'));
-        if (onSelectionComplete) onSelectionComplete(); // Call if input is cleared
+      // If query is empty, clear suggestions/status (updateQuery in slice already does this)
+      // dispatch(setStatusAction('idle'));
+      if (onSelectionComplete) onSelectionComplete(); // Call if input is cleared
     }
   };
 
@@ -94,7 +98,8 @@ export function DrugAutocomplete({ onDrugSelected, onSelectionComplete }: DrugAu
         type="text"
         value={query} // Controlled by Redux state
         onChange={handleInputChange}
-        onBlur={() => { // Call onBlur if no selection was made but focus is lost
+        onBlur={() => {
+          // Call onBlur if no selection was made but focus is lost
           if (suggestions.length === 0 && onSelectionComplete) {
             onSelectionComplete();
           }
@@ -102,10 +107,20 @@ export function DrugAutocomplete({ onDrugSelected, onSelectionComplete }: DrugAu
         placeholder="Enter medication name (min 2 chars)"
         className="w-full pr-10"
       />
-      {status === 'loading' && <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs">Loading...</div>}
-      {status === 'retrying' && <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs">Retrying...</div>}
-      
-      {status === 'failed' && error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      {status === 'loading' && (
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs">
+          Loading...
+        </div>
+      )}
+      {status === 'retrying' && (
+        <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-xs">
+          Retrying...
+        </div>
+      )}
+
+      {status === 'failed' && error && (
+        <p className="text-red-500 text-sm mt-1">{error}</p>
+      )}
 
       {/* Suggestions are now pre-filtered by the thunk to be ingredients only */}
       {suggestions.length > 0 && status === 'succeeded' && (
@@ -119,9 +134,11 @@ export function DrugAutocomplete({ onDrugSelected, onSelectionComplete }: DrugAu
                   onClick={() => handleSelectSuggestion(suggestion)}
                   className="p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-200 flex justify-between items-center"
                 >
-                  <div>{suggestion.name} ({suggestion.tty})</div>
+                  <div>
+                    {suggestion.name} ({suggestion.tty})
+                  </div>
                   {suggestion.source && (
-                    <span 
+                    <span
                       className={`px-2.5 py-0.5 text-xs font-semibold rounded-full opacity-85 ${sourceInfo.colorClasses}`}
                     >
                       {sourceInfo.fullName}
@@ -134,4 +151,4 @@ export function DrugAutocomplete({ onDrugSelected, onSelectionComplete }: DrugAu
       )}
     </div>
   );
-} 
+}

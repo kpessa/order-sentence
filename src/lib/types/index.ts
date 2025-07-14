@@ -1,7 +1,7 @@
 export interface SelectedDrugInfo {
-  name: string;        // Generic or brand name
-  rxcui: string;       // RxNorm Concept Unique Identifier
-  tty: string;         // Term Type (IN=Ingredient, BN=Brand Name, etc.)
+  name: string; // Generic or brand name
+  rxcui: string; // RxNorm Concept Unique Identifier
+  tty: string; // Term Type (IN=Ingredient, BN=Brand Name, etc.)
   isIngredient: boolean; // Whether this is an active ingredient
 }
 
@@ -24,14 +24,14 @@ export interface AppState {
 
 // As per Excel/CSV Data
 export interface OrderSentenceRow {
-  "Generic Name": string;
-  "Brand Name": string;
-  "Strength": string;
-  "Form": string;
-  "Route": string;
-  "Frequency": string;
-  "Order Type": 'PRN' | 'Scheduled' | 'Once';
-  "Order Sentence": string;
+  'Generic Name': string;
+  'Brand Name': string;
+  Strength: string;
+  Form: string;
+  Route: string;
+  Frequency: string;
+  'Order Type': 'PRN' | 'Scheduled' | 'Once';
+  'Order Sentence': string;
 }
 
 // As per Cerner Results Structure (processed/structured data)
@@ -101,10 +101,11 @@ export interface RxNormPropertiesResponse {
     umlscui: string;
     // ... and other properties
   };
-  propertyConceptList?: { // for /rxcui/{id}/property.json?propName=TTY
+  propertyConceptList?: {
+    // for /rxcui/{id}/property.json?propName=TTY
     propertyConcept?: Array<{
-        propName: string;
-        propValue: string;
+      propName: string;
+      propValue: string;
     }>;
   };
-} 
+}

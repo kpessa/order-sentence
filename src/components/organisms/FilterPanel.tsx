@@ -46,18 +46,37 @@ interface FilterSectionProps {
   initiallyOpen?: boolean;
 }
 
-export const FilterSection: React.FC<FilterSectionProps> = ({ title, columnName, children, initiallyOpen = false }) => {
+export const FilterSection: React.FC<FilterSectionProps> = ({
+  title,
+  columnName,
+  children,
+  initiallyOpen = false,
+}) => {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
   const styles = getColumnStyles(columnName);
 
   return (
     <div className="py-3 border-b border-gray-200 dark:border-gray-700 last:border-b-0">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center text-left mb-2 focus:outline-none"
       >
-        <h3 className={cn("text-sm font-semibold uppercase tracking-wide px-2 py-1 rounded-t-md w-full", styles.bg, styles.text)}>{title}</h3>
-        <span className={cn("text-xs transform transition-transform duration-200", isOpen ? 'rotate-180' : '' , styles.text)}>
+        <h3
+          className={cn(
+            'text-sm font-semibold uppercase tracking-wide px-2 py-1 rounded-t-md w-full',
+            styles.bg,
+            styles.text
+          )}
+        >
+          {title}
+        </h3>
+        <span
+          className={cn(
+            'text-xs transform transition-transform duration-200',
+            isOpen ? 'rotate-180' : '',
+            styles.text
+          )}
+        >
           ▼
         </span>
       </button>
@@ -67,21 +86,21 @@ export const FilterSection: React.FC<FilterSectionProps> = ({ title, columnName,
 };
 
 interface PillButtonProps {
-  label: string; 
+  label: string;
   isActive: boolean;
   onClick: (event?: React.MouseEvent<HTMLButtonElement>) => void;
   columnName: string;
   className?: string;
-  tooltip?: string; 
+  tooltip?: string;
 }
 
-export const PillButton: React.FC<PillButtonProps> = ({ 
-  label, 
-  isActive, 
-  onClick, 
-  columnName, 
+export const PillButton: React.FC<PillButtonProps> = ({
+  label,
+  isActive,
+  onClick,
+  columnName,
   className = '',
-  tooltip 
+  tooltip,
 }) => {
   const styles = getColumnStyles(columnName);
 
@@ -91,12 +110,22 @@ export const PillButton: React.FC<PillButtonProps> = ({
       onClick={onClick}
       className={cn(
         'w-full text-left text-xs px-2.5 py-1.5 rounded-md border whitespace-nowrap truncate hover:bg-opacity-80 focus:outline-none focus:ring-2 focus:ring-offset-1',
-        isActive 
-          ? cn(styles.pillActiveBg, styles.pillActiveText, styles.border, 'font-semibold shadow-sm') 
-          : cn('bg-gray-100 dark:bg-slate-700', styles.pillInactiveText, styles.pillInactiveBorder, 'hover:bg-gray-200 dark:hover:bg-slate-600'),
+        isActive
+          ? cn(
+              styles.pillActiveBg,
+              styles.pillActiveText,
+              styles.border,
+              'font-semibold shadow-sm'
+            )
+          : cn(
+              'bg-gray-100 dark:bg-slate-700',
+              styles.pillInactiveText,
+              styles.pillInactiveBorder,
+              'hover:bg-gray-200 dark:hover:bg-slate-600'
+            ),
         className
       )}
-      title={tooltip || label} 
+      title={tooltip || label}
     >
       {label}
     </button>
@@ -110,14 +139,26 @@ export const PillButton: React.FC<PillButtonProps> = ({
 
 export function FilterPanel(props: FilterPanelProps) {
   const {
-    selectedDescriptionPill, onSelectedDescriptionPillChange,
-    descriptionSearchText, onDescriptionSearchTextChange, top5UniqueDescriptions,
-    selectedEncounterGroup, onSelectedEncounterGroupChange, uniqueEncounterGroups,
-    selectedSynonymPill, onSelectedSynonymPillChange,
-    synonymSearchText, onSynonymSearchTextChange, top5UniqueSynonyms,
-    selectedSynonymType, onSelectedSynonymTypeChange, uniqueSynonymTypes,
-    catalogTypeSearchText, onCatalogTypeSearchTextChange,
-    orderEntryFormatSearchText, onOrderEntryFormatSearchTextChange
+    selectedDescriptionPill,
+    onSelectedDescriptionPillChange,
+    descriptionSearchText,
+    onDescriptionSearchTextChange,
+    top5UniqueDescriptions,
+    selectedEncounterGroup,
+    onSelectedEncounterGroupChange,
+    uniqueEncounterGroups,
+    selectedSynonymPill,
+    onSelectedSynonymPillChange,
+    synonymSearchText,
+    onSynonymSearchTextChange,
+    top5UniqueSynonyms,
+    selectedSynonymType,
+    onSelectedSynonymTypeChange,
+    uniqueSynonymTypes,
+    catalogTypeSearchText,
+    onCatalogTypeSearchTextChange,
+    orderEntryFormatSearchText,
+    onOrderEntryFormatSearchTextChange,
   } = props;
 
   return (
@@ -125,82 +166,160 @@ export function FilterPanel(props: FilterPanelProps) {
       <FilterSection title="Description Filters" columnName="Description">
         {top5UniqueDescriptions.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
-            <PillButton label="All Desc Pills" isActive={!selectedDescriptionPill} onClick={() => onSelectedDescriptionPillChange(undefined)} columnName="Description" className="" />
-            {top5UniqueDescriptions.map(desc => (
-              <PillButton key={desc} label={desc} isActive={selectedDescriptionPill === desc} onClick={() => onSelectedDescriptionPillChange(desc)} columnName="Description" className="" />
+            <PillButton
+              label="All Desc Pills"
+              isActive={!selectedDescriptionPill}
+              onClick={() => onSelectedDescriptionPillChange(undefined)}
+              columnName="Description"
+              className=""
+            />
+            {top5UniqueDescriptions.map((desc) => (
+              <PillButton
+                key={desc}
+                label={desc}
+                isActive={selectedDescriptionPill === desc}
+                onClick={() => onSelectedDescriptionPillChange(desc)}
+                columnName="Description"
+                className=""
+              />
             ))}
           </div>
         )}
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           placeholder="Search descriptions..."
           value={descriptionSearchText}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onDescriptionSearchTextChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onDescriptionSearchTextChange(e.target.value)
+          }
           className="h-8 text-xs"
         />
       </FilterSection>
 
       <FilterSection title="Encounter Group" columnName="Encounter Group">
         {uniqueEncounterGroups.length > 0 ? (
-            <div className="flex flex-wrap gap-1">
-                <PillButton label="All Groups" isActive={!selectedEncounterGroup} onClick={() => onSelectedEncounterGroupChange(undefined)} columnName="Encounter Group" className="" />
-                {uniqueEncounterGroups.map(group => (
-                    <PillButton key={group} label={group} isActive={selectedEncounterGroup === group} onClick={() => onSelectedEncounterGroupChange(group)} columnName="Encounter Group" className="" />
-                ))}
-            </div>
-        ) : <p className="text-xs text-slate-500">No specific groups in current results.</p>}
+          <div className="flex flex-wrap gap-1">
+            <PillButton
+              label="All Groups"
+              isActive={!selectedEncounterGroup}
+              onClick={() => onSelectedEncounterGroupChange(undefined)}
+              columnName="Encounter Group"
+              className=""
+            />
+            {uniqueEncounterGroups.map((group) => (
+              <PillButton
+                key={group}
+                label={group}
+                isActive={selectedEncounterGroup === group}
+                onClick={() => onSelectedEncounterGroupChange(group)}
+                columnName="Encounter Group"
+                className=""
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-500">
+            No specific groups in current results.
+          </p>
+        )}
       </FilterSection>
 
       <FilterSection title="Synonym Filters" columnName="Synonym">
         {top5UniqueSynonyms.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-2">
-            <PillButton label="All Syn. Pills" isActive={!selectedSynonymPill} onClick={() => onSelectedSynonymPillChange(undefined)} columnName="Synonym" className="" />
-            {top5UniqueSynonyms.map(syn => (
-              <PillButton key={syn} label={syn} isActive={selectedSynonymPill === syn} onClick={() => onSelectedSynonymPillChange(syn)} columnName="Synonym" className="" />
+            <PillButton
+              label="All Syn. Pills"
+              isActive={!selectedSynonymPill}
+              onClick={() => onSelectedSynonymPillChange(undefined)}
+              columnName="Synonym"
+              className=""
+            />
+            {top5UniqueSynonyms.map((syn) => (
+              <PillButton
+                key={syn}
+                label={syn}
+                isActive={selectedSynonymPill === syn}
+                onClick={() => onSelectedSynonymPillChange(syn)}
+                columnName="Synonym"
+                className=""
+              />
             ))}
           </div>
         )}
-        <Input 
-          type="text" 
+        <Input
+          type="text"
           placeholder="Search synonyms..."
           value={synonymSearchText}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSynonymSearchTextChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            onSynonymSearchTextChange(e.target.value)
+          }
           className="h-8 text-xs"
         />
       </FilterSection>
 
       <FilterSection title="Synonym Type" columnName="Synonym Type">
-         {uniqueSynonymTypes.length > 0 ? (
-            <div className="flex flex-wrap gap-1">
-                <PillButton label="All Syn. Types" isActive={!selectedSynonymType} onClick={() => onSelectedSynonymTypeChange(undefined)} columnName="Synonym Type" className="" />
-                {uniqueSynonymTypes.map(type => (
-                    <PillButton key={type} label={type} isActive={selectedSynonymType === type} onClick={() => onSelectedSynonymTypeChange(type)} columnName="Synonym Type" className="" />
-                ))}
-            </div>
-         ) : <p className="text-xs text-slate-500">No specific types in current results.</p>}
+        {uniqueSynonymTypes.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            <PillButton
+              label="All Syn. Types"
+              isActive={!selectedSynonymType}
+              onClick={() => onSelectedSynonymTypeChange(undefined)}
+              columnName="Synonym Type"
+              className=""
+            />
+            {uniqueSynonymTypes.map((type) => (
+              <PillButton
+                key={type}
+                label={type}
+                isActive={selectedSynonymType === type}
+                onClick={() => onSelectedSynonymTypeChange(type)}
+                columnName="Synonym Type"
+                className=""
+              />
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-500">
+            No specific types in current results.
+          </p>
+        )}
       </FilterSection>
 
       <FilterSection title="Other Filters" columnName="Default">
         <div className="space-y-2">
           <div>
-            <Label htmlFor="catalogTypeSearch" className="text-xs font-medium text-slate-600">Catalog Type</Label>
-            <Input 
+            <Label
+              htmlFor="catalogTypeSearch"
+              className="text-xs font-medium text-slate-600"
+            >
+              Catalog Type
+            </Label>
+            <Input
               id="catalogTypeSearch"
-              type="text" 
+              type="text"
               placeholder="Search catalog types..."
               value={catalogTypeSearchText}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onCatalogTypeSearchTextChange(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onCatalogTypeSearchTextChange(e.target.value)
+              }
               className="h-8 text-xs mt-1"
             />
           </div>
           <div>
-            <Label htmlFor="orderEntryFormatSearch" className="text-xs font-medium text-slate-600">Order Entry Format</Label>
-            <Input 
+            <Label
+              htmlFor="orderEntryFormatSearch"
+              className="text-xs font-medium text-slate-600"
+            >
+              Order Entry Format
+            </Label>
+            <Input
               id="orderEntryFormatSearch"
-              type="text" 
+              type="text"
               placeholder="Search order entry formats..."
               value={orderEntryFormatSearchText}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onOrderEntryFormatSearchTextChange(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onOrderEntryFormatSearchTextChange(e.target.value)
+              }
               className="h-8 text-xs mt-1"
             />
           </div>
@@ -208,4 +327,4 @@ export function FilterPanel(props: FilterPanelProps) {
       </FilterSection>
     </div>
   );
-} 
+}

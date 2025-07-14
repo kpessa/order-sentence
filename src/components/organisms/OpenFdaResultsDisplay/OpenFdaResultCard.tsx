@@ -16,10 +16,21 @@ export const OpenFdaResultCard: React.FC<OpenFdaResultCardProps> = ({
   fetchSplDetailFromDailyMed,
   CustomButton,
 }) => {
-  const brandName = result.openfda?.brand_name?.join(', ') || (result as any).brand_name || 'Unknown Brand';
-  const genericName = result.openfda?.generic_name?.join(', ') || (result as any).generic_name || 'Unknown Generic';
-  const manufacturerName = result.openfda?.manufacturer_name?.join(', ') || (result as any).sponsor_name || 'Unknown Manufacturer';
-  const setIdsForResult = result.openfda?.spl_set_id || ((result as any).set_id ? [(result as any).set_id] : []);
+  const brandName =
+    result.openfda?.brand_name?.join(', ') ||
+    (result as any).brand_name ||
+    'Unknown Brand';
+  const genericName =
+    result.openfda?.generic_name?.join(', ') ||
+    (result as any).generic_name ||
+    'Unknown Generic';
+  const manufacturerName =
+    result.openfda?.manufacturer_name?.join(', ') ||
+    (result as any).sponsor_name ||
+    'Unknown Manufacturer';
+  const setIdsForResult =
+    result.openfda?.spl_set_id ||
+    ((result as any).set_id ? [(result as any).set_id] : []);
 
   return (
     <div className="p-3 border rounded-md shadow-sm bg-slate-50 flex flex-col justify-between">
@@ -27,8 +38,16 @@ export const OpenFdaResultCard: React.FC<OpenFdaResultCardProps> = ({
         <h4 className="text-md font-semibold text-blue-700">{brandName}</h4>
         <p className="text-sm text-gray-600">Generic: {genericName}</p>
         <p className="text-xs text-gray-500">Manuf: {manufacturerName}</p>
-        {result.application_number && <p className="text-xs text-gray-500">App No: {result.application_number}</p>}
-        {result.dosage_form && <p className="text-xs text-gray-500">Form (Source): {result.dosage_form}</p>}
+        {result.application_number && (
+          <p className="text-xs text-gray-500">
+            App No: {result.application_number}
+          </p>
+        )}
+        {result.dosage_form && (
+          <p className="text-xs text-gray-500">
+            Form (Source): {result.dosage_form}
+          </p>
+        )}
       </div>
       {setIdsForResult.length > 0 && (
         <div className="mt-2 pt-2 border-t">
@@ -41,18 +60,39 @@ export const OpenFdaResultCard: React.FC<OpenFdaResultCardProps> = ({
             return (
               <div key={setId} className="mb-1 text-xs">
                 <span>{setId}</span>
-                {isLoadingDetail && <span className="ml-1 text-blue-500">(Loading XML...)</span>}
-                {!isLoadingDetail && detailEntry?.status === 'succeeded' && hasXml && <span className="ml-1 text-green-500">(XML Loaded)</span>}
-                {!isLoadingDetail && detailEntry?.status === 'succeeded' && !hasXml && <span className="ml-1 text-orange-500">(XML Not Found/Empty)</span>}
-                {fetchFailed && <span className="ml-1 text-red-500">(Error fetching XML)</span>}
-                {!isLoadingDetail && !hasXml && !fetchFailed && (!detailEntry || detailEntry.status === 'idle') && (
-                  <CustomButton 
-                    label="Fetch XML"
-                    onClick={() => dispatch(fetchSplDetailFromDailyMed(setId))}
-                    variant="link"
-                    className="ml-2 text-blue-600 hover:underline p-0 h-auto"
-                  />
+                {isLoadingDetail && (
+                  <span className="ml-1 text-blue-500">(Loading XML...)</span>
                 )}
+                {!isLoadingDetail &&
+                  detailEntry?.status === 'succeeded' &&
+                  hasXml && (
+                    <span className="ml-1 text-green-500">(XML Loaded)</span>
+                  )}
+                {!isLoadingDetail &&
+                  detailEntry?.status === 'succeeded' &&
+                  !hasXml && (
+                    <span className="ml-1 text-orange-500">
+                      (XML Not Found/Empty)
+                    </span>
+                  )}
+                {fetchFailed && (
+                  <span className="ml-1 text-red-500">
+                    (Error fetching XML)
+                  </span>
+                )}
+                {!isLoadingDetail &&
+                  !hasXml &&
+                  !fetchFailed &&
+                  (!detailEntry || detailEntry.status === 'idle') && (
+                    <CustomButton
+                      label="Fetch XML"
+                      onClick={() =>
+                        dispatch(fetchSplDetailFromDailyMed(setId))
+                      }
+                      variant="link"
+                      className="ml-2 text-blue-600 hover:underline p-0 h-auto"
+                    />
+                  )}
               </div>
             );
           })}
@@ -60,4 +100,4 @@ export const OpenFdaResultCard: React.FC<OpenFdaResultCardProps> = ({
       )}
     </div>
   );
-}; 
+};

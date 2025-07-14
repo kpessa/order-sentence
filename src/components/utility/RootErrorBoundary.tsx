@@ -23,17 +23,27 @@ export function RootErrorBoundary({ children }: RootErrorBoundaryProps) {
       stack: error.stack,
       timestamp: new Date().toISOString(),
       url: typeof window !== 'undefined' ? window.location.href : 'SSR',
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'SSR',
-      viewport: typeof window !== 'undefined' ? {
-        width: window.innerWidth,
-        height: window.innerHeight
-      } : null,
-      localStorage: typeof window !== 'undefined' ? {
-        hasReduxState: !!localStorage.getItem('persist:root')
-      } : null,
+      userAgent:
+        typeof window !== 'undefined' ? window.navigator.userAgent : 'SSR',
+      viewport:
+        typeof window !== 'undefined'
+          ? {
+              width: window.innerWidth,
+              height: window.innerHeight,
+            }
+          : null,
+      localStorage:
+        typeof window !== 'undefined'
+          ? {
+              hasReduxState: !!localStorage.getItem('persist:root'),
+            }
+          : null,
     };
 
-    console.error('[RootErrorBoundary] Critical application error:', errorReport);
+    console.error(
+      '[RootErrorBoundary] Critical application error:',
+      errorReport
+    );
 
     // In production, send to error tracking service
     // Example: Sentry, LogRocket, Bugsnag, etc.
@@ -57,7 +67,7 @@ export function RootErrorBoundary({ children }: RootErrorBoundaryProps) {
         try {
           localStorage.clear();
           sessionStorage.clear();
-          
+
           // Clear IndexedDB databases
           if ('indexedDB' in window) {
             indexedDB.databases?.().then((databases) => {
@@ -71,7 +81,7 @@ export function RootErrorBoundary({ children }: RootErrorBoundaryProps) {
         } catch (e) {
           console.warn('Failed to clear stored data:', e);
         }
-        
+
         window.location.reload();
       }
     };
@@ -88,8 +98,10 @@ Technical details:
 - URL: ${window.location.href}
 - User Agent: ${navigator.userAgent}
 `;
-      
-      window.open(`mailto:support@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+
+      window.open(
+        `mailto:support@example.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+      );
     };
 
     return (
@@ -105,7 +117,7 @@ Technical details:
             </div>
           </div>
 
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="">
             <AlertTriangle className="h-4 w-4" />
             <div>
               <h3 className="font-semibold">What can you do?</h3>
@@ -122,16 +134,17 @@ Technical details:
           </Alert>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Button 
+            <Button
               onClick={handleRefresh}
+              variant="default"
               className="flex items-center justify-center gap-2"
               size="lg"
             >
               <RefreshCw className="h-4 w-4" />
               Refresh Page
             </Button>
-            
-            <Button 
+
+            <Button
               onClick={handleGoHome}
               variant="outline"
               className="flex items-center justify-center gap-2"
@@ -140,8 +153,8 @@ Technical details:
               <Home className="h-4 w-4" />
               Go to Home
             </Button>
-            
-            <Button 
+
+            <Button
               onClick={handleClearData}
               variant="secondary"
               className="flex items-center justify-center gap-2"
@@ -150,8 +163,8 @@ Technical details:
               <AlertTriangle className="h-4 w-4" />
               Clear Data & Reload
             </Button>
-            
-            <Button 
+
+            <Button
               onClick={handleReportBug}
               variant="outline"
               className="flex items-center justify-center gap-2"
@@ -163,7 +176,10 @@ Technical details:
           </div>
 
           <div className="text-center text-sm text-muted-foreground">
-            <p>Error ID: {`${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}</p>
+            <p>
+              Error ID:{' '}
+              {`${Date.now()}-${Math.random().toString(36).substr(2, 9)}`}
+            </p>
             <p>Time: {new Date().toLocaleString()}</p>
           </div>
         </div>
@@ -178,9 +194,7 @@ Technical details:
       fallback={<RootErrorFallback />}
       showDetails={process.env.NODE_ENV === 'development'}
     >
-      <ChunkErrorBoundary>
-        {children}
-      </ChunkErrorBoundary>
+      <ChunkErrorBoundary>{children}</ChunkErrorBoundary>
     </ErrorBoundary>
   );
 }

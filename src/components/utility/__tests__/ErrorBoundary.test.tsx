@@ -13,10 +13,10 @@ afterAll(() => {
 });
 
 // Component that throws an error
-const ThrowError: React.FC<{ shouldThrow?: boolean; errorMessage?: string }> = ({ 
-  shouldThrow = true, 
-  errorMessage = 'Test error' 
-}) => {
+const ThrowError: React.FC<{
+  shouldThrow?: boolean;
+  errorMessage?: string;
+}> = ({ shouldThrow = true, errorMessage = 'Test error' }) => {
   if (shouldThrow) {
     throw new Error(errorMessage);
   }
@@ -24,7 +24,9 @@ const ThrowError: React.FC<{ shouldThrow?: boolean; errorMessage?: string }> = (
 };
 
 // Component to test useErrorHandler hook
-const TestUseErrorHandler: React.FC<{ shouldThrow?: boolean }> = ({ shouldThrow = false }) => {
+const TestUseErrorHandler: React.FC<{ shouldThrow?: boolean }> = ({
+  shouldThrow = false,
+}) => {
   const { handleError } = useErrorHandler();
 
   const triggerError = () => {
@@ -66,8 +68,12 @@ describe('ErrorBoundary', () => {
     );
 
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Try Again' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Reload Page' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Try Again' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reload Page' })
+    ).toBeInTheDocument();
   });
 
   it('should show context in error message when provided', () => {
@@ -77,7 +83,9 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    expect(screen.getByText(/An error occurred in the Test Component component/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/An error occurred in the Test Component component/)
+    ).toBeInTheDocument();
   });
 
   it('should show error details when showDetails is true', () => {
@@ -90,16 +98,16 @@ describe('ErrorBoundary', () => {
     // Check if details element exists
     const detailsElement = screen.getByText('Error Details');
     expect(detailsElement).toBeInTheDocument();
-    
+
     // Click to expand details
     fireEvent.click(detailsElement);
-    
+
     expect(screen.getAllByText(/Detailed error message/)).toHaveLength(2); // Should appear in both error message and stack
   });
 
   it('should call onError callback when an error occurs', () => {
     const onErrorMock = jest.fn();
-    
+
     render(
       <ErrorBoundary onError={onErrorMock}>
         <ThrowError shouldThrow={true} errorMessage="Callback test error" />
@@ -108,17 +116,17 @@ describe('ErrorBoundary', () => {
 
     expect(onErrorMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Callback test error'
+        message: 'Callback test error',
       }),
       expect.objectContaining({
-        componentStack: expect.any(String)
+        componentStack: expect.any(String),
       })
     );
   });
 
   it('should render custom fallback when provided', () => {
     const customFallback = <div>Custom error message</div>;
-    
+
     render(
       <ErrorBoundary fallback={customFallback}>
         <ThrowError shouldThrow={true} />
@@ -132,7 +140,7 @@ describe('ErrorBoundary', () => {
   it('should reset error state when Try Again is clicked', () => {
     let shouldThrow = true;
     const TestComponent = () => <ThrowError shouldThrow={shouldThrow} />;
-    
+
     const { rerender } = render(
       <ErrorBoundary>
         <TestComponent />
@@ -165,10 +173,10 @@ describe('ErrorBoundary', () => {
 
     const reloadButton = screen.getByRole('button', { name: 'Reload Page' });
     expect(reloadButton).toBeInTheDocument();
-    
+
     // We can't easily test window.location.reload in jsdom environment
     // but we can verify the button exists and is clickable
-    expect(reloadButton).not.toBeDisabled();
+    expect(reloadButton.hasAttribute('disabled')).toBe(false);
   });
 });
 
@@ -218,7 +226,7 @@ describe('ErrorBoundary error reporting', () => {
     expect(consoleSpy).toHaveBeenCalledWith(
       '[ErrorBoundary - Test Context]',
       expect.objectContaining({
-        message: 'Logging test error'
+        message: 'Logging test error',
       })
     );
 

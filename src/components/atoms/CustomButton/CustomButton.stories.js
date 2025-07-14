@@ -1,6 +1,6 @@
 import { CustomButton } from './CustomButton';
 
-export default {
+const meta = {
   title: 'Atoms/CustomButton',
   component: CustomButton,
   parameters: {
@@ -10,7 +10,14 @@ export default {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+      options: [
+        'default',
+        'destructive',
+        'outline',
+        'secondary',
+        'ghost',
+        'link',
+      ],
     },
     size: {
       control: { type: 'select' },
@@ -18,6 +25,8 @@ export default {
     },
   },
 };
+
+export default meta;
 
 export const Default = {
   args: {

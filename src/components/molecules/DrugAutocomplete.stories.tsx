@@ -32,9 +32,9 @@ export const Default: StoryObj<typeof DrugAutocomplete> = {
 };
 
 export const WithInitialQuery: StoryObj<typeof DrugAutocomplete> = {
-    render: (args: ComponentProps<typeof DrugAutocomplete>) => (
-        <div style={{ width: '400px' }}>
-          <DrugAutocomplete {...args} />
-        </div>
-      ),
-}; 
+  render: (args: ComponentProps<typeof DrugAutocomplete>) => (
+    <div style={{ width: '400px' }}>
+      <DrugAutocomplete {...args} />
+    </div>
+  ),
+};

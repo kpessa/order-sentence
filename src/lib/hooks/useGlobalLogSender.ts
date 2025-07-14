@@ -1,13 +1,18 @@
 'use client';
 
 import { useEffect, useCallback } from 'react';
-import { getCapturedLogs, clearCapturedLogs, initLogInterceptor } from '@/lib/utils/logInterceptor';
+import {
+  getCapturedLogs,
+  clearCapturedLogs,
+  initLogInterceptor,
+} from '@/lib/utils/logInterceptor';
 
 const LOG_SERVER_ENDPOINT = '/api/log'; // Updated to use Next.js API route
 const HOTKEY = 'l'; // Hotkey: "L"
 
 // Define specific modifier keys required
-const REQUIRED_MODIFIERS = { // Booleans to indicate if a key should be pressed
+const REQUIRED_MODIFIERS = {
+  // Booleans to indicate if a key should be pressed
   ctrlKey: true,
   altKey: true,
   shiftKey: false,
@@ -40,7 +45,11 @@ export function useGlobalLogSender() {
         console.info('Logs successfully sent to server.');
         clearCapturedLogs(); // Optionally clear logs after sending
       } else {
-        console.error('Failed to send logs:', response.status, response.statusText);
+        console.error(
+          'Failed to send logs:',
+          response.status,
+          response.statusText
+        );
         const errorData = await response.text();
         console.error('Server error response:', errorData);
       }
@@ -57,11 +66,11 @@ export function useGlobalLogSender() {
       }
 
       // Check if all REQUIRED modifier keys are pressed as specified
-      const modifiersMatch = 
-        (REQUIRED_MODIFIERS.ctrlKey === event.ctrlKey) &&
-        (REQUIRED_MODIFIERS.altKey === event.altKey) &&
-        (REQUIRED_MODIFIERS.shiftKey === event.shiftKey) &&
-        (REQUIRED_MODIFIERS.metaKey === event.metaKey);
+      const modifiersMatch =
+        REQUIRED_MODIFIERS.ctrlKey === event.ctrlKey &&
+        REQUIRED_MODIFIERS.altKey === event.altKey &&
+        REQUIRED_MODIFIERS.shiftKey === event.shiftKey &&
+        REQUIRED_MODIFIERS.metaKey === event.metaKey;
 
       if (modifiersMatch) {
         event.preventDefault();
@@ -77,5 +86,5 @@ export function useGlobalLogSender() {
   }, [sendLogsToServer]);
 
   // You can return functions or states if needed, but for now, it just sets up the listener
-  return {}; 
-} 
+  return {};
+}

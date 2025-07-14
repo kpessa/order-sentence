@@ -23,7 +23,10 @@ interface ErrorBoundaryProps {
  * Base Error Boundary Component
  * Catches JavaScript errors anywhere in the child component tree and displays a fallback UI
  */
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   private errorId: string;
 
   constructor(props: ErrorBoundaryProps) {
@@ -43,7 +46,10 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error details
-    console.error(`[ErrorBoundary${this.props.context ? ` - ${this.props.context}` : ''}]`, error);
+    console.error(
+      `[ErrorBoundary${this.props.context ? ` - ${this.props.context}` : ''}]`,
+      error
+    );
     console.error('[ErrorBoundary] Component stack:', errorInfo.componentStack);
 
     // Update state with error info
@@ -71,7 +77,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       componentStack: errorInfo.componentStack,
       context: this.props.context,
       timestamp: new Date().toISOString(),
-      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'SSR',
+      userAgent:
+        typeof window !== 'undefined' ? window.navigator.userAgent : 'SSR',
       url: typeof window !== 'undefined' ? window.location.href : 'SSR',
       errorId: this.state.errorId,
     };
@@ -107,15 +114,16 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <div className="min-h-[200px] flex items-center justify-center p-4">
           <div className="max-w-md w-full space-y-4">
-            <Alert variant="destructive">
+            <Alert variant="destructive" className="">
               <div className="space-y-3">
                 <div>
-                  <h3 className="font-semibold text-lg">Something went wrong</h3>
+                  <h3 className="font-semibold text-lg">
+                    Something went wrong
+                  </h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {this.props.context 
+                    {this.props.context
                       ? `An error occurred in the ${this.props.context} component.`
-                      : 'An unexpected error occurred.'
-                    }
+                      : 'An unexpected error occurred.'}
                   </p>
                 </div>
 
@@ -148,17 +156,19 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
                 )}
 
                 <div className="flex gap-2 pt-2">
-                  <Button 
+                  <Button
                     onClick={this.handleRetry}
-                    variant="outline" 
+                    variant="outline"
                     size="sm"
+                    className=""
                   >
                     Try Again
                   </Button>
-                  <Button 
+                  <Button
                     onClick={this.handleReload}
-                    variant="destructive" 
+                    variant="destructive"
                     size="sm"
+                    className=""
                   >
                     Reload Page
                   </Button>

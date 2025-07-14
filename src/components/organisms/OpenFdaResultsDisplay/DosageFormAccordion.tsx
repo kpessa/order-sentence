@@ -23,33 +23,63 @@ export const DosageFormAccordion: React.FC<DosageFormAccordionProps> = ({
   CustomButton,
 }) => (
   <div className="border rounded-lg shadow-sm bg-white">
-    <button 
+    <button
       onClick={() => onToggle(dosageForm)}
       className="w-full p-4 text-left bg-gray-100 hover:bg-gray-200 focus:outline-none flex justify-between items-center rounded-t-lg"
     >
-      <h3 className="text-lg font-semibold text-gray-700">{dosageForm} ({resultsInGroup.length} products)</h3>
+      <h3 className="text-lg font-semibold text-gray-700">
+        {dosageForm} ({resultsInGroup.length} products)
+      </h3>
       <span className="text-xl">{expanded ? '−' : '+'}</span>
     </button>
     {expanded && (
       <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {resultsInGroup.map((result: OpenFdaResult, index: number) => {
-          const brandName = result.openfda?.brand_name?.join(', ') || (result as any).brand_name || 'Unknown Brand';
-          const genericName = result.openfda?.generic_name?.join(', ') || (result as any).generic_name || 'Unknown Generic';
-          const manufacturerName = result.openfda?.manufacturer_name?.join(', ') || (result as any).sponsor_name || 'Unknown Manufacturer';
-          const setIdsForResult = result.openfda?.spl_set_id || ((result as any).set_id ? [(result as any).set_id] : []);
+          const brandName =
+            result.openfda?.brand_name?.join(', ') ||
+            (result as any).brand_name ||
+            'Unknown Brand';
+          const genericName =
+            result.openfda?.generic_name?.join(', ') ||
+            (result as any).generic_name ||
+            'Unknown Generic';
+          const manufacturerName =
+            result.openfda?.manufacturer_name?.join(', ') ||
+            (result as any).sponsor_name ||
+            'Unknown Manufacturer';
+          const setIdsForResult =
+            result.openfda?.spl_set_id ||
+            ((result as any).set_id ? [(result as any).set_id] : []);
 
           return (
-            <div key={result.id || result.application_number || `item-${index}`} className="p-3 border rounded-md shadow-sm bg-slate-50 flex flex-col justify-between">
+            <div
+              key={result.id || result.application_number || `item-${index}`}
+              className="p-3 border rounded-md shadow-sm bg-slate-50 flex flex-col justify-between"
+            >
               <div>
-                <h4 className="text-md font-semibold text-blue-700">{brandName}</h4>
+                <h4 className="text-md font-semibold text-blue-700">
+                  {brandName}
+                </h4>
                 <p className="text-sm text-gray-600">Generic: {genericName}</p>
-                <p className="text-xs text-gray-500">Manuf: {manufacturerName}</p>
-                {result.application_number && <p className="text-xs text-gray-500">App No: {result.application_number}</p>}
-                {result.dosage_form && <p className="text-xs text-gray-500">Form (Source): {result.dosage_form}</p>}
+                <p className="text-xs text-gray-500">
+                  Manuf: {manufacturerName}
+                </p>
+                {result.application_number && (
+                  <p className="text-xs text-gray-500">
+                    App No: {result.application_number}
+                  </p>
+                )}
+                {result.dosage_form && (
+                  <p className="text-xs text-gray-500">
+                    Form (Source): {result.dosage_form}
+                  </p>
+                )}
               </div>
               {setIdsForResult.length > 0 && (
                 <div className="mt-2 pt-2 border-t">
-                  <p className="text-xs font-medium text-gray-600 mb-1">SPL SET IDs:</p>
+                  <p className="text-xs font-medium text-gray-600 mb-1">
+                    SPL SET IDs:
+                  </p>
                   {setIdsForResult.map((setId: string) => {
                     const detailEntry = dailyMedDetails[setId];
                     const isLoadingDetail = detailEntry?.status === 'loading';
@@ -58,18 +88,43 @@ export const DosageFormAccordion: React.FC<DosageFormAccordionProps> = ({
                     return (
                       <div key={setId} className="mb-1 text-xs">
                         <span>{setId}</span>
-                        {isLoadingDetail && <span className="ml-1 text-blue-500">(Loading XML...)</span>}
-                        {!isLoadingDetail && detailEntry?.status === 'succeeded' && hasXml && <span className="ml-1 text-green-500">(XML Loaded)</span>}
-                        {!isLoadingDetail && detailEntry?.status === 'succeeded' && !hasXml && <span className="ml-1 text-orange-500">(XML Not Found/Empty)</span>}
-                        {fetchFailed && <span className="ml-1 text-red-500">(Error fetching XML)</span>}
-                        {!isLoadingDetail && !hasXml && !fetchFailed && (!detailEntry || detailEntry.status === 'idle') && (
-                          <CustomButton 
-                            label="Fetch XML"
-                            onClick={() => dispatch(fetchSplDetailFromDailyMed(setId))}
-                            variant="link"
-                            className="ml-2 text-blue-600 hover:underline p-0 h-auto"
-                          />
+                        {isLoadingDetail && (
+                          <span className="ml-1 text-blue-500">
+                            (Loading XML...)
+                          </span>
                         )}
+                        {!isLoadingDetail &&
+                          detailEntry?.status === 'succeeded' &&
+                          hasXml && (
+                            <span className="ml-1 text-green-500">
+                              (XML Loaded)
+                            </span>
+                          )}
+                        {!isLoadingDetail &&
+                          detailEntry?.status === 'succeeded' &&
+                          !hasXml && (
+                            <span className="ml-1 text-orange-500">
+                              (XML Not Found/Empty)
+                            </span>
+                          )}
+                        {fetchFailed && (
+                          <span className="ml-1 text-red-500">
+                            (Error fetching XML)
+                          </span>
+                        )}
+                        {!isLoadingDetail &&
+                          !hasXml &&
+                          !fetchFailed &&
+                          (!detailEntry || detailEntry.status === 'idle') && (
+                            <CustomButton
+                              label="Fetch XML"
+                              onClick={() =>
+                                dispatch(fetchSplDetailFromDailyMed(setId))
+                              }
+                              variant="link"
+                              className="ml-2 text-blue-600 hover:underline p-0 h-auto"
+                            />
+                          )}
                       </div>
                     );
                   })}
@@ -81,4 +136,4 @@ export const DosageFormAccordion: React.FC<DosageFormAccordionProps> = ({
       </div>
     )}
   </div>
-); 
+);

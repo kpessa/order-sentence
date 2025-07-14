@@ -45,8 +45,8 @@ export const NoDataFound: StoryObj<typeof ExcelOrderSentenceTable> = {
 };
 
 export const WithGlobalFilter: StoryObj<typeof ExcelOrderSentenceTable> = {
-    args: {
-      rxcui: '153165',
-      drugName: 'Atorvastatin',
-    },
-  }; 
+  args: {
+    rxcui: '153165',
+    drugName: 'Atorvastatin',
+  },
+};

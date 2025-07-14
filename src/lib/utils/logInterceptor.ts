@@ -30,12 +30,14 @@ function getCallSite(stack: string): string {
   // Line 2: at addLogEntry (...
   // Line 3: at console.log (...
   // Line 4: usually the actual call site
-  let callSiteLine = lines[4] || lines[3] || lines[lines.length -1]; // Fallback to deeper or last line
-  
+  let callSiteLine = lines[4] || lines[3] || lines[lines.length - 1]; // Fallback to deeper or last line
+
   if (callSiteLine) {
     // Example line: "    at Module.functionName (http://localhost:3000/path/to/file.js:123:45)"
     // Or: "    at http://localhost:3000/path/to/file.js:123:45"
-    const match = callSiteLine.match(/\((.*):(\d+):(\d+)\)$/) || callSiteLine.match(/at (.*):(\d+):(\d+)$/);
+    const match =
+      callSiteLine.match(/\((.*):(\d+):(\d+)\)$/) ||
+      callSiteLine.match(/at (.*):(\d+):(\d+)$/);
     if (match) {
       const filePath = match[1];
       const fileName = filePath.substring(filePath.lastIndexOf('/') + 1);
@@ -44,14 +46,16 @@ function getCallSite(stack: string): string {
     // Simpler extraction if no parenthesis (e.g. Next.js server components or different stack formats)
     const parts = callSiteLine.trim().split(' ').pop(); // Get the last part, which might be path:line:col
     if (parts && parts.includes(':')) {
-        const pathParts = parts.split(':');
-        const potentialFilePath = pathParts.slice(0, -2).join(':');
-        const line = pathParts[pathParts.length -2];
-        if (potentialFilePath && line && !isNaN(parseInt(line))) {
-            const fileName = potentialFilePath.substring(potentialFilePath.lastIndexOf('/') + 1);
-            if (fileName) return ` ${fileName}:${line}`;
-            return ` ${potentialFilePath}:${line}`;
-        }
+      const pathParts = parts.split(':');
+      const potentialFilePath = pathParts.slice(0, -2).join(':');
+      const line = pathParts[pathParts.length - 2];
+      if (potentialFilePath && line && !isNaN(parseInt(line))) {
+        const fileName = potentialFilePath.substring(
+          potentialFilePath.lastIndexOf('/') + 1
+        );
+        if (fileName) return ` ${fileName}:${line}`;
+        return ` ${potentialFilePath}:${line}`;
+      }
     }
     return ` ${callSiteLine.trim()}`;
   }
@@ -76,7 +80,11 @@ function saveLogs(logs: LogEntry[]): void {
   }
 }
 
-function addLogEntry(type: LogEntry['type'], message: string, optionalParams: any[]): void {
+function addLogEntry(
+  type: LogEntry['type'],
+  message: string,
+  optionalParams: any[]
+): void {
   if (typeof window === 'undefined') return; // Don't run on server
 
   const stack = new Error().stack || '';
@@ -114,31 +122,51 @@ export function initLogInterceptor(): void {
     const stack = new Error().stack || '';
     const callSite = getCallSite(stack);
     originalConsole.log(`[LOG]${callSite}`, message, ...optionalParams);
-    addLogEntry('LOG', typeof message === 'string' ? message : JSON.stringify(message), optionalParams);
+    addLogEntry(
+      'LOG',
+      typeof message === 'string' ? message : JSON.stringify(message),
+      optionalParams
+    );
   };
   console.info = (message?: any, ...optionalParams: any[]) => {
     const stack = new Error().stack || '';
     const callSite = getCallSite(stack);
     originalConsole.info(`[INFO]${callSite}`, message, ...optionalParams);
-    addLogEntry('INFO', typeof message === 'string' ? message : JSON.stringify(message), optionalParams);
+    addLogEntry(
+      'INFO',
+      typeof message === 'string' ? message : JSON.stringify(message),
+      optionalParams
+    );
   };
   console.warn = (message?: any, ...optionalParams: any[]) => {
     const stack = new Error().stack || '';
     const callSite = getCallSite(stack);
     originalConsole.warn(`[WARN]${callSite}`, message, ...optionalParams);
-    addLogEntry('WARN', typeof message === 'string' ? message : JSON.stringify(message), optionalParams);
+    addLogEntry(
+      'WARN',
+      typeof message === 'string' ? message : JSON.stringify(message),
+      optionalParams
+    );
   };
   console.error = (message?: any, ...optionalParams: any[]) => {
     const stack = new Error().stack || '';
     const callSite = getCallSite(stack);
     originalConsole.error(`[ERROR]${callSite}`, message, ...optionalParams);
-    addLogEntry('ERROR', typeof message === 'string' ? message : JSON.stringify(message), optionalParams);
+    addLogEntry(
+      'ERROR',
+      typeof message === 'string' ? message : JSON.stringify(message),
+      optionalParams
+    );
   };
   console.debug = (message?: any, ...optionalParams: any[]) => {
     const stack = new Error().stack || '';
     const callSite = getCallSite(stack);
     originalConsole.debug(`[DEBUG]${callSite}`, message, ...optionalParams);
-    addLogEntry('DEBUG', typeof message === 'string' ? message : JSON.stringify(message), optionalParams);
+    addLogEntry(
+      'DEBUG',
+      typeof message === 'string' ? message : JSON.stringify(message),
+      optionalParams
+    );
   };
 
   isInterceptorActive = true;
@@ -154,4 +182,4 @@ export function clearCapturedLogs(): void {
   if (typeof window === 'undefined') return;
   saveLogs([]);
   originalConsole.info('Captured logs cleared from session storage.');
-} 
+}

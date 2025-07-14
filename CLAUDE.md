@@ -49,6 +49,7 @@ pnpm format:check # Check code formatting
 ## Project Structure & Conventions
 
 ### Directory Structure (Atomic Design)
+
 ```
 src/
 ├── app/                    # Next.js App Router pages
@@ -77,13 +78,16 @@ src/
 ```
 
 ### File Naming Conventions
+
 - Components: PascalCase (e.g., `DrugAutocomplete.tsx`)
 - Stories: `ComponentName.stories.js`
 - Utilities: camelCase (e.g., `parseOrderSentence.ts`)
 - **Important**: UI components from shadcn are `.jsx` files, not TypeScript
 
 ### State Management
+
 Redux store with three main slices:
+
 - `drugSearchSlice`: Drug search, selected drug, RxNorm data
 - `excelDataSlice`: Excel file data, parsed order sentences
 - `fdaDataSlice`: OpenFDA results, DailyMed SPLs, prioritized data
@@ -93,16 +97,19 @@ Redux store with three main slices:
 ## Architecture Patterns
 
 ### Data Flow
+
 1. **Drug Search**: User input → RxNorm API → Filter ingredients → Redux store
 2. **Excel Processing**: Upload file → Parse with xlsx → Store in Redux/IndexedDB
 3. **FDA Data**: Selected drug → OpenFDA API → DailyMed API → Prioritize by dosage form
 
 ### API Integration
+
 - **RxNorm API**: Direct client-side calls for drug search
 - **OpenFDA API**: Client-side calls with multiple search strategies
 - **DailyMed API**: Proxied through `/api/dailymed/[setid]` to avoid CORS
 
 ### Key Features
+
 - Real-time drug autocomplete with ingredient filtering
 - Excel order sentence parsing with regex patterns
 - Multi-column filtering and sorting in data tables
@@ -118,6 +125,7 @@ Redux store with three main slices:
 3. **API Proxying**: DailyMed API requires proxy due to CORS. Use `/api/dailymed/[setid]` endpoint.
 
 4. **Component Imports**: Always use path aliases:
+
    - `@/components/*`
    - `@/lib/*`
    - `@/app/*`
@@ -129,10 +137,12 @@ Redux store with three main slices:
 ## External API Dependencies
 
 1. **RxNorm API** (https://rxnav.nlm.nih.gov)
+
    - Drug name to RxCUI lookup
    - Ingredient type filtering (IN, MIN, PIN)
 
 2. **OpenFDA API** (https://api.fda.gov)
+
    - Drug label information
    - NDC to SPL mapping
 
@@ -151,14 +161,16 @@ Redux store with three main slices:
 ## Testing Infrastructure
 
 ### Unit Testing (Jest + React Testing Library)
+
 - **Coverage**: Redux slices, utility functions, API routes
 - **Mock Factories**: External API responses for consistent testing
 - **Test Structure**: Comprehensive test suites with descriptive scenarios
 - **Configuration**: TypeScript support with jsdom environment
 
 ### End-to-End Testing (Playwright)
+
 - **Browser Coverage**: Chrome, Firefox, Safari (desktop + mobile)
-- **Test Categories**: 
+- **Test Categories**:
   - Basic smoke tests (page loading, responsive design)
   - Main workflows (drug search, Excel viewer, OpenFDA integration)
   - Component integration (autocomplete, state management)
@@ -167,12 +179,14 @@ Redux store with three main slices:
 - **Error Handling**: Network failures, invalid inputs, JavaScript errors
 
 ### CI/CD Pipeline (GitHub Actions)
+
 - **Triggers**: Pull requests and main branch pushes
 - **Steps**: Linting, type checking, unit tests, E2E tests
 - **Reporting**: Test coverage and artifact upload
 - **Browser Installation**: Automated Playwright setup
 
 ### Test Commands Summary
+
 ```bash
 pnpm test          # Unit tests
 pnpm test:coverage # Unit tests with coverage
@@ -183,6 +197,7 @@ pnpm test:all      # All tests
 ## Environment Configuration
 
 ### Environment Variables
+
 The application uses environment variables for configuration and API endpoints:
 
 - **`.env.example`**: Template with all available configuration options and documentation
@@ -190,6 +205,7 @@ The application uses environment variables for configuration and API endpoints:
 - **`.env.production`**: Production configuration template
 
 ### API Configuration
+
 - **Centralized Configuration**: All API endpoints managed through `src/lib/config/api.ts`
 - **Environment-based URLs**: API base URLs configurable via environment variables
 - **Timeout Configuration**: Configurable timeouts for each API service
@@ -197,6 +213,7 @@ The application uses environment variables for configuration and API endpoints:
 - **Error Handling**: Consistent error handling across all API calls
 
 ### Key Environment Variables
+
 - `NEXT_PUBLIC_RXNORM_API_BASE_URL`: RxNorm API base URL
 - `NEXT_PUBLIC_OPENFDA_API_BASE_URL`: OpenFDA API base URL
 - `NEXT_PUBLIC_DAILYMED_API_BASE_URL`: DailyMed API base URL
@@ -206,27 +223,33 @@ The application uses environment variables for configuration and API endpoints:
 ## Error Handling
 
 ### React Error Boundaries
+
 The application implements a comprehensive error boundary system for graceful error handling:
 
 #### Error Boundary Components
+
 1. **`ErrorBoundary`**: Base error boundary component with customizable fallback UI
+
    - Context-aware error messages
    - Optional error details display in development
    - Retry functionality
    - Error callbacks for reporting
 
 2. **`RootErrorBoundary`**: Application-level error boundary
+
    - Wraps entire application in layout.tsx
    - Provides comprehensive error recovery options
    - Clears local storage/IndexedDB when needed
    - Error reporting integration ready
 
 3. **`RouteErrorBoundary`**: Route-level error handling
+
    - Wraps individual pages
    - Route-specific error messages
    - Navigation recovery options
 
 4. **`ApiErrorBoundary`**: API-specific error handling
+
    - Wraps components making API calls
    - API-specific error messages
    - Retry API calls functionality
@@ -237,6 +260,7 @@ The application implements a comprehensive error boundary system for graceful er
    - Clear cache and reload options
 
 #### Error Boundary Usage
+
 ```tsx
 // Root level (in layout.tsx)
 <RootErrorBoundary>
@@ -255,6 +279,7 @@ The application implements a comprehensive error boundary system for graceful er
 ```
 
 #### Error Recovery Features
+
 - Try Again button to reset error state
 - Reload Page to refresh the application
 - Clear Data & Reload for persistent errors
@@ -262,10 +287,11 @@ The application implements a comprehensive error boundary system for graceful er
 - Automatic error logging to console with context
 
 ### Key Environment Variables
+
 ```bash
 # API Base URLs
 NEXT_PUBLIC_RXNORM_API_BASE_URL=https://rxnav.nlm.nih.gov/REST
-NEXT_PUBLIC_OPENFDA_API_BASE_URL=https://api.fda.gov/drug  
+NEXT_PUBLIC_OPENFDA_API_BASE_URL=https://api.fda.gov/drug
 NEXT_PUBLIC_DAILYMED_API_BASE_URL=https://dailymed.nlm.nih.gov/dailymed/services/v2
 
 # API Timeouts
@@ -290,6 +316,7 @@ ENABLE_REQUEST_LOGGING=true
 ## Workflow Context
 
 The app supports different healthcare workflows:
+
 - Pharmacist Detailed Review
 - Rapid Clinical Assessment
 - Complete Inventory Audit

@@ -1,9 +1,9 @@
 // Mock factory for external API calls
 export const createMockFetch = () => {
-  const mockFetch = jest.fn()
-  global.fetch = mockFetch
-  return mockFetch
-}
+  const mockFetch = jest.fn();
+  global.fetch = mockFetch;
+  return mockFetch;
+};
 
 // RxNorm API Mock Factory
 export const mockRxNormApiResponse = (data: any) => {
@@ -11,8 +11,8 @@ export const mockRxNormApiResponse = (data: any) => {
     ok: true,
     status: 200,
     json: async () => data,
-  }
-}
+  };
+};
 
 // OpenFDA API Mock Factory
 export const mockOpenFdaApiResponse = (data: any) => {
@@ -20,8 +20,8 @@ export const mockOpenFdaApiResponse = (data: any) => {
     ok: true,
     status: 200,
     json: async () => data,
-  }
-}
+  };
+};
 
 // DailyMed API Mock Factory
 export const mockDailyMedApiResponse = (xmlContent: string) => {
@@ -29,8 +29,8 @@ export const mockDailyMedApiResponse = (xmlContent: string) => {
     ok: true,
     status: 200,
     text: async () => xmlContent,
-  }
-}
+  };
+};
 
 // Mock data factories
 export const createMockDrug = (overrides: any = {}) => ({
@@ -38,17 +38,17 @@ export const createMockDrug = (overrides: any = {}) => ({
   name: 'Lisinopril',
   tty: 'IN',
   ...overrides,
-})
+});
 
 export const createMockExcelRow = (overrides: any = {}) => ({
   'Order Id': '123456',
   'Drug Name': 'Lisinopril',
-  'Dose': '10 mg',
-  'Route': 'PO',
-  'Frequency': 'Daily',
-  'Instructions': 'Take with food',
+  Dose: '10 mg',
+  Route: 'PO',
+  Frequency: 'Daily',
+  Instructions: 'Take with food',
   ...overrides,
-})
+});
 
 export const createMockOpenFdaResult = (overrides: any = {}) => ({
   id: 'test-id',
@@ -60,7 +60,7 @@ export const createMockOpenFdaResult = (overrides: any = {}) => ({
   route: ['Oral'],
   manufacturer_name: ['Test Manufacturer'],
   ...overrides,
-})
+});
 
 export const createMockSpl = (overrides: any = {}) => ({
   setId: 'test-set-id',
@@ -68,7 +68,7 @@ export const createMockSpl = (overrides: any = {}) => ({
   effectiveTime: '2024-01-01',
   xmlContent: '<spl>test content</spl>',
   ...overrides,
-})
+});
 
 export const createMockPrioritizedSpl = (overrides: any = {}) => ({
   setId: 'test-set-id',
@@ -78,7 +78,7 @@ export const createMockPrioritizedSpl = (overrides: any = {}) => ({
   priority: 1,
   dosageForm: 'Tablet',
   ...overrides,
-})
+});
 
 // Mock IndexedDB
 export const createMockIndexedDB = () => {
@@ -90,40 +90,40 @@ export const createMockIndexedDB = () => {
     put: jest.fn(),
     delete: jest.fn(),
     clear: jest.fn(),
-  }
+  };
 
   const mockTransaction = {
     objectStore: jest.fn(() => mockDB),
     oncomplete: null,
     onerror: null,
-  }
+  };
 
   const mockRequest = {
     result: mockDB,
     onsuccess: null,
     onerror: null,
-  }
+  };
 
   const mockIndexedDB = {
     open: jest.fn(() => mockRequest),
     deleteDatabase: jest.fn(),
     cmp: jest.fn(),
-  }
+  };
 
-  global.indexedDB = mockIndexedDB as any
-  
+  global.indexedDB = mockIndexedDB as any;
+
   return {
     mockDB,
     mockTransaction,
     mockRequest,
     mockIndexedDB,
-  }
-}
+  };
+};
 
 // Mock Window APIs
 export const mockWindowAPIs = () => {
   // Mock window.location
-  delete (window as any).location
+  delete (window as any).location;
   window.location = {
     href: 'http://localhost:3000',
     origin: 'http://localhost:3000',
@@ -133,12 +133,12 @@ export const mockWindowAPIs = () => {
     pathname: '/',
     search: '',
     hash: '',
-  } as any
+  } as any;
 
   // Mock window.alert, confirm, prompt
-  window.alert = jest.fn()
-  window.confirm = jest.fn(() => true)
-  window.prompt = jest.fn(() => 'test')
+  window.alert = jest.fn();
+  window.confirm = jest.fn(() => true);
+  window.prompt = jest.fn(() => 'test');
 
   // Mock localStorage
   const mockLocalStorage = {
@@ -146,8 +146,8 @@ export const mockWindowAPIs = () => {
     setItem: jest.fn(),
     removeItem: jest.fn(),
     clear: jest.fn(),
-  }
-  global.localStorage = mockLocalStorage as any
+  };
+  global.localStorage = mockLocalStorage as any;
 
   // Mock sessionStorage
   const mockSessionStorage = {
@@ -155,14 +155,14 @@ export const mockWindowAPIs = () => {
     setItem: jest.fn(),
     removeItem: jest.fn(),
     clear: jest.fn(),
-  }
-  global.sessionStorage = mockSessionStorage as any
+  };
+  global.sessionStorage = mockSessionStorage as any;
 
   return {
     mockLocalStorage,
     mockSessionStorage,
-  }
-}
+  };
+};
 
 // Mock file operations
 export const createMockFile = (
@@ -170,9 +170,9 @@ export const createMockFile = (
   content: string,
   type: string = 'text/plain'
 ) => {
-  const file = new File([content], name, { type })
-  return file
-}
+  const file = new File([content], name, { type });
+  return file;
+};
 
 export const createMockFileReader = () => {
   const mockFileReader = {
@@ -187,36 +187,36 @@ export const createMockFileReader = () => {
     onloadend: null,
     onprogress: null,
     onabort: null,
-  }
+  };
 
-  global.FileReader = jest.fn(() => mockFileReader) as any
+  global.FileReader = jest.fn(() => mockFileReader) as any;
 
-  return mockFileReader
-}
+  return mockFileReader;
+};
 
 // Mock Console methods for testing
 export const mockConsole = () => {
-  const originalConsole = { ...console }
-  
-  console.log = jest.fn()
-  console.warn = jest.fn()
-  console.error = jest.fn()
-  console.info = jest.fn()
-  console.debug = jest.fn()
+  const originalConsole = { ...console };
+
+  console.log = jest.fn();
+  console.warn = jest.fn();
+  console.error = jest.fn();
+  console.info = jest.fn();
+  console.debug = jest.fn();
 
   return {
     restore: () => {
-      console.log = originalConsole.log
-      console.warn = originalConsole.warn
-      console.error = originalConsole.error
-      console.info = originalConsole.info
-      console.debug = originalConsole.debug
+      console.log = originalConsole.log;
+      console.warn = originalConsole.warn;
+      console.error = originalConsole.error;
+      console.info = originalConsole.info;
+      console.debug = originalConsole.debug;
     },
-  }
-}
+  };
+};
 
 // Reset all mocks
 export const resetAllMocks = () => {
-  jest.clearAllMocks()
-  jest.restoreAllMocks()
-}
+  jest.clearAllMocks();
+  jest.restoreAllMocks();
+};

@@ -8,6 +8,7 @@ A Next.js 14+ pharmaceutical/medical data analysis application for healthcare pr
 ## Features
 
 ### Core Functionality
+
 - 🔍 **Drug Search**: Real-time autocomplete using RxNorm API
 - 📊 **Excel Processing**: Parse and analyze Cerner order sentences
 - 💊 **FDA Integration**: OpenFDA and DailyMed data integration
@@ -15,6 +16,7 @@ A Next.js 14+ pharmaceutical/medical data analysis application for healthcare pr
 - 🏥 **Healthcare Workflows**: Support for various clinical workflows
 
 ### Technical Stack
+
 - **Framework**: Next.js 14+ with App Router
 - **State Management**: Redux Toolkit with Redux Persist
 - **UI**: Tailwind CSS + shadcn/ui components
@@ -25,6 +27,7 @@ A Next.js 14+ pharmaceutical/medical data analysis application for healthcare pr
 ## Quick Start
 
 ### Development
+
 ```bash
 # Install dependencies
 pnpm install
@@ -37,6 +40,7 @@ pnpm storybook
 ```
 
 ### Testing
+
 ```bash
 # Run unit tests
 pnpm test
@@ -49,6 +53,7 @@ pnpm test:all
 ```
 
 ### Code Quality
+
 ```bash
 # Lint and fix
 pnpm lint:fix

@@ -1,5 +1,14 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
-import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER,
+} from 'redux-persist';
 import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 
 import drugSearchReducer from './slices/drugSearchSlice';
@@ -22,9 +31,10 @@ const createNoopStorage = () => {
 };
 
 // Use localStorage on client, noop on server
-const storage = typeof window !== 'undefined' 
-  ? createWebStorage('local') 
-  : createNoopStorage();
+const storage =
+  typeof window !== 'undefined'
+    ? createWebStorage('local')
+    : createNoopStorage();
 
 const persistConfig = {
   key: 'root',
@@ -53,7 +63,7 @@ export const store = configureStore({
       // Configure immutableCheck to ignore the large excelData.data path
       immutableCheck: {
         ignoredPaths: ['excelData.data'],
-      }
+      },
     }),
 });
 

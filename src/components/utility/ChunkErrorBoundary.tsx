@@ -17,9 +17,10 @@ interface ChunkErrorBoundaryProps {
 export function ChunkErrorBoundary({ children }: ChunkErrorBoundaryProps) {
   const handleError = (error: Error) => {
     // Check if this is a chunk loading error
-    const isChunkError = error.message.includes('Loading chunk') || 
-                        error.message.includes('ChunkLoadError') ||
-                        error.name === 'ChunkLoadError';
+    const isChunkError =
+      error.message.includes('Loading chunk') ||
+      error.message.includes('ChunkLoadError') ||
+      error.name === 'ChunkLoadError';
 
     console.error('[ChunkErrorBoundary]', {
       message: error.message,
@@ -30,7 +31,9 @@ export function ChunkErrorBoundary({ children }: ChunkErrorBoundaryProps) {
 
     // If it's a chunk error, we might want to handle it differently
     if (isChunkError) {
-      console.warn('[ChunkErrorBoundary] Detected chunk loading error - this usually means the app was updated');
+      console.warn(
+        '[ChunkErrorBoundary] Detected chunk loading error - this usually means the app was updated'
+      );
     }
   };
 
@@ -49,7 +52,7 @@ export function ChunkErrorBoundary({ children }: ChunkErrorBoundaryProps) {
           });
         });
       }
-      
+
       // Clear browser caches
       if ('caches' in window) {
         caches.keys().then((names) => {
@@ -66,13 +69,14 @@ export function ChunkErrorBoundary({ children }: ChunkErrorBoundaryProps) {
     return (
       <div className="min-h-[300px] flex items-center justify-center p-4">
         <div className="max-w-md w-full space-y-4">
-          <Alert>
+          <Alert variant="default" className="">
             <Download className="h-4 w-4" />
             <div className="space-y-3">
               <div>
                 <h3 className="font-semibold">Update Required</h3>
                 <p className="text-sm text-muted-foreground mt-1">
-                  The application has been updated. Please refresh the page to get the latest version.
+                  The application has been updated. Please refresh the page to
+                  get the latest version.
                 </p>
               </div>
 
@@ -86,7 +90,7 @@ export function ChunkErrorBoundary({ children }: ChunkErrorBoundaryProps) {
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button 
+                <Button
                   onClick={handleRefresh}
                   variant="default"
                   size="sm"
@@ -95,7 +99,7 @@ export function ChunkErrorBoundary({ children }: ChunkErrorBoundaryProps) {
                   <RefreshCw className="h-3 w-3" />
                   Refresh Page
                 </Button>
-                <Button 
+                <Button
                   onClick={handleClearCache}
                   variant="outline"
                   size="sm"

@@ -10,7 +10,7 @@ export interface ColumnStyling {
 }
 
 export const columnStyles: Record<string, ColumnStyling> = {
-  'Default': {
+  Default: {
     bg: 'bg-slate-100',
     text: 'text-slate-800',
     border: 'border-slate-400',
@@ -20,7 +20,7 @@ export const columnStyles: Record<string, ColumnStyling> = {
     pillInactiveText: 'text-slate-700',
     cellBg: 'bg-slate-50', // Lighter than bg-slate-100
   },
-  'Description': {
+  Description: {
     bg: 'bg-sky-100',
     text: 'text-sky-800',
     border: 'border-sky-500',
@@ -40,7 +40,7 @@ export const columnStyles: Record<string, ColumnStyling> = {
     pillInactiveText: 'text-emerald-700',
     cellBg: 'bg-emerald-50',
   },
-  'Synonym': {
+  Synonym: {
     bg: 'bg-amber-100',
     text: 'text-amber-800',
     border: 'border-amber-500',
@@ -90,7 +90,8 @@ export const columnStyles: Record<string, ColumnStyling> = {
     pillInactiveText: 'text-gray-700',
     cellBg: 'bg-gray-50', // Lighter gray for cells
   },
-  'Sentence': { // Added specifically for the 'Sentence' accessorKey if different from 'Order Sentence' visual title
+  Sentence: {
+    // Added specifically for the 'Sentence' accessorKey if different from 'Order Sentence' visual title
     bg: 'bg-gray-200',
     text: 'text-gray-800',
     border: 'border-gray-400',
@@ -105,4 +106,4 @@ export const columnStyles: Record<string, ColumnStyling> = {
 
 export const getColumnStyles = (columnName: string): ColumnStyling => {
   return columnStyles[columnName] || columnStyles['Default'];
-}; 
+};

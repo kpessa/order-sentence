@@ -16,7 +16,10 @@ interface RouteErrorBoundaryProps {
  * Specialized Error Boundary for route/page-level errors
  * Provides navigation options and route-specific error handling
  */
-export function RouteErrorBoundary({ children, routeName }: RouteErrorBoundaryProps) {
+export function RouteErrorBoundary({
+  children,
+  routeName,
+}: RouteErrorBoundaryProps) {
   const router = useRouter();
 
   const handleError = (error: Error) => {
@@ -53,10 +56,9 @@ export function RouteErrorBoundary({ children, routeName }: RouteErrorBoundaryPr
             <AlertTriangle className="h-16 w-16 text-destructive mx-auto" />
             <h1 className="text-2xl font-bold">Page Error</h1>
             <p className="text-muted-foreground">
-              {routeName 
+              {routeName
                 ? `There was a problem loading the ${routeName} page.`
-                : 'There was a problem loading this page.'
-              }
+                : 'There was a problem loading this page.'}
             </p>
           </div>
 
@@ -65,7 +67,8 @@ export function RouteErrorBoundary({ children, routeName }: RouteErrorBoundaryPr
             <div>
               <h3 className="font-semibold">What happened?</h3>
               <p className="text-sm mt-1">
-                A JavaScript error occurred while rendering this page. This could be due to:
+                A JavaScript error occurred while rendering this page. This
+                could be due to:
               </p>
               <ul className="text-sm mt-2 ml-4 list-disc space-y-1">
                 <li>Invalid data being passed to components</li>
@@ -77,25 +80,24 @@ export function RouteErrorBoundary({ children, routeName }: RouteErrorBoundaryPr
           </Alert>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button 
+            <Button
               onClick={handleRefresh}
               variant="default"
+              size="default"
               className="flex items-center gap-2"
             >
               <RefreshCw className="h-4 w-4" />
               Refresh Page
             </Button>
-            
-            <Button 
-              onClick={handleGoBack}
-              variant="outline"
-            >
+
+            <Button onClick={handleGoBack} variant="outline" size="default" className="">
               Go Back
             </Button>
-            
-            <Button 
+
+            <Button
               onClick={handleGoHome}
               variant="secondary"
+              size="default"
               className="flex items-center gap-2"
             >
               <Home className="h-4 w-4" />
@@ -109,9 +111,19 @@ export function RouteErrorBoundary({ children, routeName }: RouteErrorBoundaryPr
                 Development Information
               </summary>
               <div className="text-xs text-muted-foreground space-y-1">
-                <div>Route: {typeof window !== 'undefined' ? window.location.pathname : 'SSR'}</div>
+                <div>
+                  Route:{' '}
+                  {typeof window !== 'undefined'
+                    ? window.location.pathname
+                    : 'SSR'}
+                </div>
                 <div>Time: {new Date().toLocaleString()}</div>
-                <div>User Agent: {typeof window !== 'undefined' ? window.navigator.userAgent : 'SSR'}</div>
+                <div>
+                  User Agent:{' '}
+                  {typeof window !== 'undefined'
+                    ? window.navigator.userAgent
+                    : 'SSR'}
+                </div>
               </div>
             </details>
           )}

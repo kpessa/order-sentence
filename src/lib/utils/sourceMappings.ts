@@ -41,7 +41,15 @@ export const SOURCE_INFO_MAP: Record<string, SourceInfo> = {
 
 export const getSourceInfo = (acronym?: string): SourceInfo => {
   if (!acronym) {
-    return { fullName: 'N/A', colorClasses: 'bg-gray-100 text-gray-700 hover:bg-gray-200' };
+    return {
+      fullName: 'N/A',
+      colorClasses: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    };
   }
-  return SOURCE_INFO_MAP[acronym.toUpperCase()] || { fullName: acronym, colorClasses: 'bg-gray-100 text-gray-700 hover:bg-gray-200' };
-}; 
+  return (
+    SOURCE_INFO_MAP[acronym.toUpperCase()] || {
+      fullName: acronym,
+      colorClasses: 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+    }
+  );
+};

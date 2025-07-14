@@ -1,6 +1,6 @@
 import { SearchForm } from './SearchForm';
 
-export default {
+const meta = {
   title: 'Molecules/SearchForm',
   component: SearchForm,
   parameters: {
@@ -8,6 +8,8 @@ export default {
   },
   tags: ['autodocs'],
 };
+
+export default meta;
 
 export const Default = {
   args: {

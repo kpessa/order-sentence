@@ -20,6 +20,7 @@ gh auth login
 ## Useful Commands for Your Project
 
 ### Check Recent Workflow Runs
+
 ```bash
 # List all recent runs
 gh run list
@@ -33,6 +34,7 @@ gh run list --workflow=deploy.yml
 ```
 
 ### View Specific Run Details
+
 ```bash
 # Get the run ID from the list, then:
 gh run view <RUN_ID>
@@ -48,6 +50,7 @@ gh run watch <RUN_ID>
 ```
 
 ### Debug Failed Runs
+
 ```bash
 # View specific job logs
 gh run view <RUN_ID> --job <JOB_ID> --log
@@ -60,6 +63,7 @@ gh run rerun <RUN_ID> --failed
 ```
 
 ### Workflow Management
+
 ```bash
 # List all workflows
 gh workflow list
@@ -94,7 +98,7 @@ LATEST_RUN=$(gh run list --limit 1 --json databaseId --jq '.[0].databaseId')
 if [ ! -z "$LATEST_RUN" ]; then
     echo -e "\n=== Latest Run Details ==="
     gh run view $LATEST_RUN
-    
+
     echo -e "\n=== View logs? (y/n) ==="
     read -r response
     if [[ "$response" == "y" ]]; then
@@ -104,6 +108,7 @@ fi
 ```
 
 Make it executable:
+
 ```bash
 chmod +x check-actions.sh
 ./check-actions.sh
@@ -127,11 +132,13 @@ curl -s "https://api.github.com/repos/kpessa/order-sentence/actions/runs/RUN_ID/
 ## Current Workflow Status
 
 To check your current deployment status:
+
 1. Visit: https://github.com/kpessa/order-sentence/actions
 2. Look for the latest runs triggered by your commits
 3. Click on any failed run to see detailed logs
 
 The recent fixes should resolve:
+
 - ✅ Node.js version (now using 20.x only)
 - ✅ pnpm version (now using v9 to match lockfile)
 - ✅ All deployment configuration is in place

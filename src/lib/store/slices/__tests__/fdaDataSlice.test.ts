@@ -314,7 +314,9 @@ describe('fdaDataSlice', () => {
         json: async () => mockOpenFdaApiResponse,
       } as Response);
 
-      const result = await store.dispatch(fetchFdaDataByNdcs(mockNdcList) as any);
+      const result = await store.dispatch(
+        fetchFdaDataByNdcs(mockNdcList) as any
+      );
 
       expect(result.type).toBe('fdaData/fetchFdaDataByNdcs/fulfilled');
       expect(result.payload).toEqual({
@@ -344,7 +346,9 @@ describe('fdaDataSlice', () => {
         statusText: 'Not Found',
       } as Response);
 
-      const result = await store.dispatch(fetchFdaDataByNdcs(mockNdcList) as any);
+      const result = await store.dispatch(
+        fetchFdaDataByNdcs(mockNdcList) as any
+      );
 
       expect(result.type).toBe('fdaData/fetchFdaDataByNdcs/rejected');
       expect(result.payload).toBe(
@@ -363,7 +367,9 @@ describe('fdaDataSlice', () => {
         json: async () => noResultsResponse,
       } as Response);
 
-      const result = await store.dispatch(fetchFdaDataByNdcs(mockNdcList) as any);
+      const result = await store.dispatch(
+        fetchFdaDataByNdcs(mockNdcList) as any
+      );
 
       expect(result.type).toBe('fdaData/fetchFdaDataByNdcs/rejected');
       expect(result.payload).toBe(
@@ -387,9 +393,7 @@ describe('fdaDataSlice', () => {
       const payload = result.payload as FetchFdaDataPayload;
       expect(payload.results).toHaveLength(1);
       expect(payload.results[0].brand_name).toBe('Lisinopril Brand');
-      expect(payload.results[0].openfda?.application_type).toEqual([
-        'NDA',
-      ]);
+      expect(payload.results[0].openfda?.application_type).toEqual(['NDA']);
 
       const state = store.getState().fdaData;
       expect(state.status).toBe('fda_queried');
@@ -397,7 +401,9 @@ describe('fdaDataSlice', () => {
     });
 
     it('should handle empty drug name', async () => {
-      const result = await store.dispatch(fetchOpenFdaDataByDrugName('') as any);
+      const result = await store.dispatch(
+        fetchOpenFdaDataByDrugName('') as any
+      );
 
       expect(result.type).toBe('fdaData/fetchOpenFdaDataByDrugName/rejected');
       expect(result.payload).toBe('No drug name provided to fetch FDA data.');
@@ -488,7 +494,9 @@ describe('fdaDataSlice', () => {
         text: async () => JSON.stringify(mixedResponse),
       } as Response);
 
-      const result = await store.dispatch(fetchOpenFdaDataByDrugName('Test') as any);
+      const result = await store.dispatch(
+        fetchOpenFdaDataByDrugName('Test') as any
+      );
 
       expect(result.type).toBe('fdaData/fetchOpenFdaDataByDrugName/fulfilled');
       // The thunk returns all results, filtering happens in the reducer
@@ -498,7 +506,9 @@ describe('fdaDataSlice', () => {
       const state = store.getState().fdaData;
       // But the state should only have the filtered results
       expect(state.openFdaResults).toHaveLength(1);
-      expect(state.openFdaResults[0].openfda?.application_type).toEqual(['NDA']);
+      expect(state.openFdaResults[0].openfda?.application_type).toEqual([
+        'NDA',
+      ]);
       expect(state.totalOpenFdaResults).toBe(1);
     });
   });
@@ -623,7 +633,9 @@ describe('fdaDataSlice', () => {
     });
 
     it('should handle empty drug name', async () => {
-      const result = await store.dispatch(fetchSplsFromDailyMedByName('') as any);
+      const result = await store.dispatch(
+        fetchSplsFromDailyMedByName('') as any
+      );
 
       expect(result.type).toBe('fdaData/fetchSplsFromDailyMedByName/rejected');
       expect(result.payload).toBe(

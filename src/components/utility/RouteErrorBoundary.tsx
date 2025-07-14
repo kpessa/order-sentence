@@ -90,7 +90,12 @@ export function RouteErrorBoundary({
               Refresh Page
             </Button>
 
-            <Button onClick={handleGoBack} variant="outline" size="default" className="">
+            <Button
+              onClick={handleGoBack}
+              variant="outline"
+              size="default"
+              className=""
+            >
               Go Back
             </Button>
 

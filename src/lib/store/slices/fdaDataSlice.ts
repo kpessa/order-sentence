@@ -178,58 +178,55 @@ export const fetchFdaDataByNdcs = createAsyncThunk<
   FetchFdaDataPayload, // Updated return type
   string[], // Argument type: list of NDCs
   { rejectValue: string; state: RootState }
->(
-  'fdaData/fetchFdaDataByNdcs',
-  async (ndcList, { rejectWithValue }) => {
-    if (!ndcList || ndcList.length === 0) {
-      return rejectWithValue('No NDCs provided to fetch FDA data.');
-    }
-    // For now, let's use the first NDC. Your workflow describes more complex prioritization later.
-    // And openFDA product_ndc search often needs just the first part (e.g., 0045-0005 from 00045-0005-05)
-    const firstNdc = ndcList[0];
-    const productNdc = firstNdc.includes('-')
-      ? firstNdc.substring(0, firstNdc.lastIndexOf('-'))
-      : firstNdc;
+>('fdaData/fetchFdaDataByNdcs', async (ndcList, { rejectWithValue }) => {
+  if (!ndcList || ndcList.length === 0) {
+    return rejectWithValue('No NDCs provided to fetch FDA data.');
+  }
+  // For now, let's use the first NDC. Your workflow describes more complex prioritization later.
+  // And openFDA product_ndc search often needs just the first part (e.g., 0045-0005 from 00045-0005-05)
+  const firstNdc = ndcList[0];
+  const productNdc = firstNdc.includes('-')
+    ? firstNdc.substring(0, firstNdc.lastIndexOf('-'))
+    : firstNdc;
 
-    // Alternative: search by multiple NDCs if API supports it well, e.g. joined by OR
-    // const searchQuery = ndcList.map(ndc => `openfda.product_ndc:"${ndc.substring(0, ndc.lastIndexOf('-'))}"`).join('+OR+');
-    // const url = `https://api.fda.gov/drug/label.json?search=(${searchQuery})&limit=10`;
+  // Alternative: search by multiple NDCs if API supports it well, e.g. joined by OR
+  // const searchQuery = ndcList.map(ndc => `openfda.product_ndc:"${ndc.substring(0, ndc.lastIndexOf('-'))}"`).join('+OR+');
+  // const url = `https://api.fda.gov/drug/label.json?search=(${searchQuery})&limit=10`;
 
-    const url = API_ENDPOINTS.OPENFDA.DRUG_LABEL_BY_NDC(productNdc);
-    console.log(`[fetchFdaDataByNdcs] Querying openFDA: ${url}`);
-    logApiCall(url);
+  const url = API_ENDPOINTS.OPENFDA.DRUG_LABEL_BY_NDC(productNdc);
+  console.log(`[fetchFdaDataByNdcs] Querying openFDA: ${url}`);
+  logApiCall(url);
 
-    try {
-      const response = await fetch(url);
-      if (!response.ok) {
-        // Consider more specific error handling for 404 (no data) vs other API errors
-        if (response.status === 404) {
-          return rejectWithValue(
-            `No FDA data found for product NDC: ${productNdc} (derived from ${firstNdc})`
-          );
-        }
-        throw new Error(
-          `openFDA API Error: ${response.status} ${response.statusText}`
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      // Consider more specific error handling for 404 (no data) vs other API errors
+      if (response.status === 404) {
+        return rejectWithValue(
+          `No FDA data found for product NDC: ${productNdc} (derived from ${firstNdc})`
         );
       }
-      const data: OpenFdaApiResponse = await response.json(); // Use the new interface
-      if (data.results && data.results.length > 0) {
-        return {
-          results: data.results,
-          total: data.meta?.results?.total || data.results.length, // Use total from meta if available
-        };
-      }
-      // Handle case where API returns 200 OK but no results array or empty results
-      return rejectWithValue(
-        `No FDA data found in 'results' for product NDC: ${productNdc}`
-      );
-    } catch (error: any) {
-      return rejectWithValue(
-        error.message || 'Failed to fetch data from openFDA'
+      throw new Error(
+        `openFDA API Error: ${response.status} ${response.statusText}`
       );
     }
+    const data: OpenFdaApiResponse = await response.json(); // Use the new interface
+    if (data.results && data.results.length > 0) {
+      return {
+        results: data.results,
+        total: data.meta?.results?.total || data.results.length, // Use total from meta if available
+      };
+    }
+    // Handle case where API returns 200 OK but no results array or empty results
+    return rejectWithValue(
+      `No FDA data found in 'results' for product NDC: ${productNdc}`
+    );
+  } catch (error: any) {
+    return rejectWithValue(
+      error.message || 'Failed to fetch data from openFDA'
+    );
   }
-);
+});
 
 // REFACTORED: Step 3: Query /drugsfda.json for approved products (NDA/ANDA/BLA) by Drug Name
 export const fetchOpenFdaDataByDrugName = createAsyncThunk<

@@ -16,9 +16,7 @@ import {
   selectDailyMedDetails,
   fetchSplDetailFromDailyMed,
 } from '@/lib/store/slices/fdaDataSlice';
-import {
-  performSplPrioritization,
-} from '@/lib/utils/splPrioritization';
+import { performSplPrioritization } from '@/lib/utils/splPrioritization';
 
 export function OpenFdaResultsDisplay() {
   const dispatch = useDispatch<AppDispatch>();
@@ -371,7 +369,8 @@ export function OpenFdaResultsDisplay() {
             No Approved Products Found on OpenFDA
           </h3>
           <p className="text-sm text-yellow-600">
-            No products matching the criteria (NDA, ANDA, BLA) were found for &apos;
+            No products matching the criteria (NDA, ANDA, BLA) were found for
+            &apos;
             {currentDrugNameQuery}&apos;.
           </p>
         </div>
@@ -545,8 +544,8 @@ export function OpenFdaResultsDisplay() {
           </section>
         ) : (
           <p className="text-sm text-gray-600">
-            No prioritized SPLs to display. Click &quot;Prioritize SPLs&quot; after
-            fetching data.
+            No prioritized SPLs to display. Click &quot;Prioritize SPLs&quot;
+            after fetching data.
           </p>
         )}
 

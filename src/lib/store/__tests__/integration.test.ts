@@ -113,7 +113,9 @@ describe('Redux Store Integration', () => {
       const state = store.getState();
 
       expect(state.drugSearch.query).toBe('query-999');
-      expect(endTime - startTime).toBeLessThan(100); // Should be fast
+      // CI environments can be slower, so we use a higher threshold
+      const threshold = process.env.CI ? 300 : 100;
+      expect(endTime - startTime).toBeLessThan(threshold); // Should be fast
     });
 
     it('should handle multiple state updates efficiently', () => {
@@ -128,7 +130,9 @@ describe('Redux Store Integration', () => {
       const state = store.getState();
 
       expect(state.drugSearch.query).toBe('term-99');
-      expect(endTime - startTime).toBeLessThan(50); // Should be fast
+      // CI environments can be slower, so we use a higher threshold
+      const threshold = process.env.CI ? 150 : 50;
+      expect(endTime - startTime).toBeLessThan(threshold); // Should be fast
     });
   });
 

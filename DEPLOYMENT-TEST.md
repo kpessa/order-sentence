@@ -139,7 +139,7 @@ Use this checklist to verify your deployment is working correctly after pushing 
 - [ ] Performance meets expectations
 - [ ] Security headers properly configured
 
-**Tested by**: ********\_\_\_********  
-**Date**: ********\_\_\_********  
+**Tested by**: **\*\*\*\***\_\_\_**\*\*\*\***  
+**Date**: **\*\*\*\***\_\_\_**\*\*\*\***  
 **Environment**: Production / Preview  
-**Notes**: ********\_\_\_********
+**Notes**: **\*\*\*\***\_\_\_**\*\*\*\***

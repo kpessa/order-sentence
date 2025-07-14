@@ -1,6 +1,4 @@
-import {
-  performSplPrioritization,
-} from '../splPrioritization';
+import { performSplPrioritization } from '../splPrioritization';
 import { DailyMedSplDetail } from '../../store/slices/fdaDataSlice';
 
 // Mock xml2js

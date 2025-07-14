@@ -96,7 +96,6 @@ interface ExcelRowWithParsed extends ExcelRow {
 //   </Button>
 // );
 
-
 // Define the custom filter function
 const smartIncludesFilter: FilterFn<ExcelRowWithParsed> = (
   row: Row<ExcelRowWithParsed>,
@@ -414,23 +413,26 @@ export function ExcelOrderSentenceTable({
   }, [dataAfterRawPanelFilters, displayMode]);
 
   // For ColumnHeaderFilterPopover unique values (derived from dataForTableBeforeColumnFilters)
-  const getUniqueColumnValues = useCallback((columnId: string): string[] => {
-    if (!dataAfterParsedPanelFilters) return [];
-    const values = dataAfterParsedPanelFilters.map(
-      (row: ExcelRowWithParsed) => {
-        if (columnId.startsWith('_parsedSentence.')) {
-          const key = columnId.split('.')[1] as keyof ParsedOrderSentence;
-          return row._parsedSentence ? row._parsedSentence[key] : undefined;
+  const getUniqueColumnValues = useCallback(
+    (columnId: string): string[] => {
+      if (!dataAfterParsedPanelFilters) return [];
+      const values = dataAfterParsedPanelFilters.map(
+        (row: ExcelRowWithParsed) => {
+          if (columnId.startsWith('_parsedSentence.')) {
+            const key = columnId.split('.')[1] as keyof ParsedOrderSentence;
+            return row._parsedSentence ? row._parsedSentence[key] : undefined;
+          }
+          return (row as ExcelRow)[columnId];
         }
-        return (row as ExcelRow)[columnId];
-      }
-    );
-    return Array.from(
-      new Set(
-        values.filter((val) => val !== undefined && val !== null).map(String)
-      )
-    ).sort();
-  }, [dataAfterParsedPanelFilters]);
+      );
+      return Array.from(
+        new Set(
+          values.filter((val) => val !== undefined && val !== null).map(String)
+        )
+      ).sort();
+    },
+    [dataAfterParsedPanelFilters]
+  );
 
   const uniqueCatalogTypesForPopover = useMemo(
     () => getUniqueColumnValues('Catalog Type'),
@@ -486,17 +488,12 @@ export function ExcelOrderSentenceTable({
     [getUniqueColumnValues]
   );
 
-
   const rawColumns = useMemo<ColumnDef<ExcelRowWithParsed>[]>(
     () => [
       {
         accessorKey: 'Catalog Type',
         header: ({ column }) =>
-          createHeader(
-            'Catalog Type',
-            column,
-            uniqueCatalogTypesForPopover
-          ),
+          createHeader('Catalog Type', column, uniqueCatalogTypesForPopover),
         cell: ({ getValue }) => (
           <div
             className={cn(
@@ -536,11 +533,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: 'Description',
         header: ({ column }) =>
-          createHeader(
-            'Description',
-            column,
-            uniqueDescriptionsForPopover
-          ),
+          createHeader('Description', column, uniqueDescriptionsForPopover),
         cell: ({ getValue }) => (
           <div
             className={cn(
@@ -576,11 +569,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: 'Synonym Type',
         header: ({ column }) =>
-          createHeader(
-            'Synonym Type',
-            column,
-            uniqueSynonymTypesForPopover
-          ),
+          createHeader('Synonym Type', column, uniqueSynonymTypesForPopover),
         cell: ({ getValue }) => (
           <div
             className={cn(
@@ -620,12 +609,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: 'Sentence',
         header: ({ column }) =>
-          createHeader(
-            'Order Sentence',
-            column,
-            undefined,
-            'Sentence'
-          ),
+          createHeader('Order Sentence', column, undefined, 'Sentence'),
         cell: ({ getValue }) => (
           <div
             className={cn(
@@ -653,16 +637,12 @@ export function ExcelOrderSentenceTable({
     ]
   );
 
-  const parsedColumns = useMemo<ColumnDef<ExcelRowWithParsed>[]>(() => [
+  const parsedColumns = useMemo<ColumnDef<ExcelRowWithParsed>[]>(
+    () => [
       {
         accessorKey: 'Synonym',
         header: ({ column }) =>
-          createHeader(
-            'Synonym',
-            column,
-            uniqueSynonymsForPopover,
-            'Synonym'
-          ),
+          createHeader('Synonym', column, uniqueSynonymsForPopover, 'Synonym'),
         cell: ({ getValue }) => (
           <div
             className={cn(
@@ -680,12 +660,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: '_parsedSentence.DOSE',
         header: ({ column }) =>
-          createHeader(
-            'DOSE',
-            column,
-            uniqueParsedDoseForPopover,
-            'Default'
-          ),
+          createHeader('DOSE', column, uniqueParsedDoseForPopover, 'Default'),
         cell: (info) => (
           <div
             className={cn(
@@ -703,12 +678,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: '_parsedSentence.DOSE_UOM',
         header: ({ column }) =>
-          createHeader(
-            'UOM',
-            column,
-            uniqueParsedUOMForPopover,
-            'Default'
-          ),
+          createHeader('UOM', column, uniqueParsedUOMForPopover, 'Default'),
         cell: (info) => (
           <div
             className={cn(
@@ -726,12 +696,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: '_parsedSentence.RXROUTE',
         header: ({ column }) =>
-          createHeader(
-            'Route',
-            column,
-            uniqueParsedRouteForPopover,
-            'Default'
-          ),
+          createHeader('Route', column, uniqueParsedRouteForPopover, 'Default'),
         cell: (info) => (
           <div
             className={cn(
@@ -749,12 +714,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: '_parsedSentence.DOSE_FORM',
         header: ({ column }) =>
-          createHeader(
-            'Form',
-            column,
-            uniqueParsedFormForPopover,
-            'Default'
-          ),
+          createHeader('Form', column, uniqueParsedFormForPopover, 'Default'),
         cell: (info) => (
           <div
             className={cn(
@@ -795,12 +755,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: '_parsedSentence.PRN',
         header: ({ column }) =>
-          createHeader(
-            'PRN',
-            column,
-            uniqueParsedPrnForPopover,
-            'Default'
-          ),
+          createHeader('PRN', column, uniqueParsedPrnForPopover, 'Default'),
         cell: (info) => (
           <div
             className={cn(
@@ -841,12 +796,7 @@ export function ExcelOrderSentenceTable({
       {
         accessorKey: 'Sentence',
         header: ({ column }) =>
-          createHeader(
-            'Original Sentence',
-            column,
-            undefined,
-            'Sentence'
-          ),
+          createHeader('Original Sentence', column, undefined, 'Sentence'),
         cell: (info) => (
           <div
             className={cn(
@@ -995,8 +945,8 @@ export function ExcelOrderSentenceTable({
     if (noResultsAfterPanelFilters) {
       return (
         <p>
-          No order sentences found for &quot;{drugName}&quot; after applying panel
-          filters.
+          No order sentences found for &quot;{drugName}&quot; after applying
+          panel filters.
         </p>
       );
     }

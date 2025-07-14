@@ -5,40 +5,43 @@
     "prettier/prettier": "warn",
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
-    
+
     // Rapid prototyping rules - warnings instead of errors
-    "@typescript-eslint/no-unused-vars": ["warn", { 
-      "argsIgnorePattern": "^_",
-      "varsIgnorePattern": "^_",
-      "ignoreRestSiblings": true
-    }],
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
     "no-unused-vars": "off", // Turn off base rule as we use @typescript-eslint
-    
+
     // Allow console logs during development
     "no-console": "off",
-    
+
     // Relax React hooks rules to warnings
     "react-hooks/rules-of-hooks": "warn",
     "react-hooks/exhaustive-deps": "warn",
-    
+
     // Allow any types during prototyping
     "@typescript-eslint/no-explicit-any": "off",
-    
+
     // Allow non-null assertions
     "@typescript-eslint/no-non-null-assertion": "off",
-    
+
     // Allow anonymous default exports (common in Storybook)
     "import/no-anonymous-default-export": "off",
-    
+
     // Allow empty interfaces and types
     "@typescript-eslint/no-empty-interface": "off",
-    
+
     // Warn on missing return types instead of error
     "@typescript-eslint/explicit-module-boundary-types": "off",
-    
+
     // Allow require() calls
     "@typescript-eslint/no-var-requires": "off",
-    
+
     // Next.js specific relaxations
     "@next/next/no-img-element": "warn",
     "@next/next/no-html-link-for-pages": "warn"

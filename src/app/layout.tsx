@@ -4,6 +4,7 @@ import "./globals.css";
 import { StoreProvider } from '@/lib/store/StoreProvider'; // Adjusted path
 // import { useGlobalLogSender } from '@/lib/hooks/useGlobalLogSender'; // No longer directly used here
 import { GlobalEffects } from '@/components/utility/GlobalEffects'; // Import from new location
+import { RootErrorBoundary } from '@/components/utility/RootErrorBoundary';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,10 +44,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <StoreProvider>
-          <GlobalEffects />
-          {children}
-        </StoreProvider>
+        <RootErrorBoundary>
+          <StoreProvider>
+            <GlobalEffects />
+            {children}
+          </StoreProvider>
+        </RootErrorBoundary>
       </body>
     </html>
   );

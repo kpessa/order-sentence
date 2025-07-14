@@ -1,0 +1,68 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm build",
+  "outputDirectory": ".next",
+  "installCommand": "pnpm install",
+  "ignoreCommand": "git diff HEAD^ HEAD --quiet -- .",
+  "env": {
+    "NEXT_PUBLIC_RXNORM_API_BASE_URL": "@rxnorm_api_base_url",
+    "NEXT_PUBLIC_OPENFDA_API_BASE_URL": "@openfda_api_base_url",
+    "NEXT_PUBLIC_DAILYMED_API_BASE_URL": "@dailymed_api_base_url",
+    "NEXT_PUBLIC_API_RXNORM_TIMEOUT": "@api_rxnorm_timeout",
+    "NEXT_PUBLIC_API_OPENFDA_TIMEOUT": "@api_openfda_timeout",
+    "NEXT_PUBLIC_API_DAILYMED_TIMEOUT": "@api_dailymed_timeout",
+    "NEXT_PUBLIC_ENABLE_API_LOGGING": "@enable_api_logging",
+    "NEXT_PUBLIC_MAX_RETRIES": "@max_retries",
+    "NEXT_PUBLIC_RETRY_DELAY": "@retry_delay"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=()"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/dailymed/:path*",
+      "destination": "https://dailymed.nlm.nih.gov/dailymed/services/v2/:path*"
+    }
+  ],
+  "functions": {
+    "api/dailymed/[setid]/route.ts": {
+      "maxDuration": 30
+    },
+    "api/log/route.ts": {
+      "maxDuration": 10
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { API_ENDPOINTS, logApiCall } from '@/lib/config/api';
 
 export async function GET(
   request: Request,
@@ -10,8 +11,9 @@ export async function GET(
     return NextResponse.json({ error: 'SET ID is required' }, { status: 400 });
   }
 
-  const dailyMedUrl = `https://dailymed.nlm.nih.gov/dailymed/services/v2/spls/${setid}.xml`;
+  const dailyMedUrl = API_ENDPOINTS.DAILYMED.SPL_XML(setid);
   console.log(`[API Route /api/dailymed] Fetching XML from DailyMed: ${dailyMedUrl}`);
+  logApiCall(dailyMedUrl);
 
   try {
     const response = await fetch(dailyMedUrl, {

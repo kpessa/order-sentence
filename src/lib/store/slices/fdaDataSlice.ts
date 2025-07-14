@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { ParsedSplProductData } from '../../utils/splPrioritization';
+import { API_ENDPOINTS, logApiCall, handleApiError } from '@/lib/config/api';
 
 // --- Interfaces based on your workflow --- 
 interface RxNormNdcResponse {
@@ -144,7 +145,9 @@ export const fetchNdcsByRxcui = createAsyncThunk<
   'fdaData/fetchNdcsByRxcui',
   async (rxcui, { rejectWithValue }) => {
     try {
-      const response = await fetch(`https://rxnav.nlm.nih.gov/REST/rxcui/${rxcui}/ndcs.json`);
+      const url = API_ENDPOINTS.RXNORM.RXCUI_NDCS(rxcui);
+      logApiCall(url);
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`RxNorm API Error: ${response.status} ${response.statusText}`);
       }
@@ -176,8 +179,9 @@ export const fetchFdaDataByNdcs = createAsyncThunk<
     // const searchQuery = ndcList.map(ndc => `openfda.product_ndc:"${ndc.substring(0, ndc.lastIndexOf('-'))}"`).join('+OR+');
     // const url = `https://api.fda.gov/drug/label.json?search=(${searchQuery})&limit=10`;
 
-    const url = `https://api.fda.gov/drug/label.json?search=openfda.product_ndc:"${productNdc}"&limit=10`;
+    const url = API_ENDPOINTS.OPENFDA.DRUG_LABEL_BY_NDC(productNdc);
     console.log(`[fetchFdaDataByNdcs] Querying openFDA: ${url}`);
+    logApiCall(url);
 
     try {
       const response = await fetch(url);
@@ -225,9 +229,10 @@ export const fetchOpenFdaDataByDrugName = createAsyncThunk<
     // const searchQueryWithDocType = `${searchQuery} AND openfda.application_doc_type:("Original" OR "Original Application" OR "Tentative Approval" OR "Approval")`; 
     // For now, simpler search, relying on drugsfda data being approved products.
     const limit = 100; // Max limit for drugsfda.json is 100 as well
-    const url = `https://api.fda.gov/drug/drugsfda.json?search=${searchQuery}&limit=${limit}`;
+    const url = API_ENDPOINTS.OPENFDA.DRUGS_FDA(searchQuery, limit);
     
     console.log(`[fetchOpenFdaDataByDrugName] Querying Drugs@FDA endpoint: ${url}`);
+    logApiCall(url);
 
     try {
       const response = await fetch(url);
@@ -433,7 +438,8 @@ export const fetchSplsFromDailyMedByName = createAsyncThunk<
     }
     const encodedDrugName = encodeURIComponent(drugName.toLowerCase());
     // Using pagesize=100 as a reasonable limit, adjust if needed.
-    const url = `https://dailymed.nlm.nih.gov/dailymed/services/v2/spls.json?drug_name=${encodedDrugName}&pagesize=100`;
+    const url = API_ENDPOINTS.DAILYMED.SPL_BY_DRUG_NAME(drugName);
+    logApiCall(url);
     console.log(`[fetchSplsFromDailyMedByName] Querying DailyMed SPLs by drug name: ${url}`);
 
     try {

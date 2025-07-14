@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RxNormSuggestion, SelectedDrugInfo } from '@/lib/types';
+import { API_ENDPOINTS, logApiCall, handleApiError } from '@/lib/config/api';
 import type { RootState } from '../index'; // Import RootState for selectors
 
 // Define the state structure for this slice
@@ -92,7 +93,8 @@ export const fetchDrugResults = createAsyncThunk<
     const MAX_SECONDARY_TTY_FETCHES_CANDIDATES = 5; // Consider top N candidates for secondary fetch if no TTY
 
     console.log('Fetching RxNorm approximate terms for:', query);
-    const approximateTermUrl = `https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=${encodeURIComponent(query)}&maxEntries=10&option=1`;
+    const approximateTermUrl = API_ENDPOINTS.RXNORM.APPROXIMATE_TERM(query);
+    logApiCall(approximateTermUrl);
 
     try {
       const initialResponse = await fetch(approximateTermUrl);
@@ -135,7 +137,8 @@ export const fetchDrugResults = createAsyncThunk<
             // console.log(`Creating promise to fetch TTY for candidate ${cand.rxcui} (${candidateName}) (exact match without TTY). Source: ${cand.source}`);
             
             const fetchTtyPromise = async (): Promise<RxNormSuggestion | null> => {
-              const ttyUrl = `https://rxnav.nlm.nih.gov/REST/rxcui/${cand.rxcui}/property.json?propName=TTY`;
+              const ttyUrl = API_ENDPOINTS.RXNORM.RXCUI_PROPERTY(cand.rxcui, 'TTY');
+          logApiCall(ttyUrl);
               try {
                 const ttyResponse = await fetch(ttyUrl);
                 // console.log(`TTY fetch for ${cand.rxcui} (${candidateName}) - Status: ${ttyResponse.status}`);
@@ -208,8 +211,8 @@ export const fetchDrugResults = createAsyncThunk<
       return deDupedSuggestions.slice(0, 15);
 
     } catch (err: any) {
-      console.error('RxNorm API call (hybrid approach with Promise.all) failed:', err);
-      return rejectWithValue(err.message || 'Failed to fetch drug suggestions from RxNorm (hybrid approach)');
+      const errorInfo = handleApiError(err, 'RxNorm API call (hybrid approach with Promise.all)');
+      return rejectWithValue(errorInfo.message || 'Failed to fetch drug suggestions from RxNorm (hybrid approach)');
     }
   }
 );

@@ -32,6 +32,8 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+# Exception: Include .env.production as it contains only public values and documentation
+!.env.production
 
 # vercel
 .vercel
@@ -40,10 +42,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Local Environment Variables
+# Local Environment Variables - Always ignore these
 .env*.local
 .env
 
 # Log files from custom logger
 application-logs.txt
 logs/
+
+# Test results and temporary files
+test-results/
+playwright-report/
+tasks.md

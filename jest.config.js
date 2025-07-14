@@ -48,6 +48,7 @@ const customJestConfig = {
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/tests/',
+    '<rootDir>/src/e2e/', // Exclude Playwright tests
   ],
   
   // Transform ignore patterns

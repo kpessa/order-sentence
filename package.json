@@ -19,7 +19,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
-    "test:all": "npm run test:ci && npm run test:e2e",
+    "test:all": "pnpm run test:ci && pnpm run test:e2e",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

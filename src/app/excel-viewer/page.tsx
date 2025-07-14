@@ -12,6 +12,8 @@ import { fetchExcelData, selectAllExcelData, selectExcelDataLoading, selectExcel
 import { selectSelectedDrug } from '@/lib/store/slices/drugSearchSlice';
 import { DrugAutocomplete } from '@/components/molecules/DrugAutocomplete';
 import { PencilIcon } from 'lucide-react';
+import { RouteErrorBoundary } from '@/components/utility/RouteErrorBoundary';
+import { ApiErrorBoundary } from '@/components/utility/ApiErrorBoundary';
 
 function ExcelViewerContent() {
     const router = useRouter();
@@ -124,10 +126,14 @@ function ExcelViewerContent() {
 
 export default function ExcelViewerPage() {
   return (
-    <main className="w-full p-4 md:p-8">
+    <RouteErrorBoundary routeName="Excel Viewer">
+      <main className="w-full p-4 md:p-8">
         <Suspense fallback={<div className="text-center text-lg font-semibold">Loading drug information...</div>}>
+          <ApiErrorBoundary apiName="Excel Data">
             <ExcelViewerContent />
+          </ApiErrorBoundary>
         </Suspense>
-    </main>
+      </main>
+    </RouteErrorBoundary>
   );
 } 

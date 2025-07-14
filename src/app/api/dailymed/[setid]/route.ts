@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server';
-import { NextRequest } from 'next/server';
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { setid: string } }
+  request: Request,
+  { params }: { params: Promise<{ setid: string }> }
 ) {
-  const setid = params.setid;
+  const { setid } = await params;
 
   if (!setid) {
     return NextResponse.json({ error: 'SET ID is required' }, { status: 400 });

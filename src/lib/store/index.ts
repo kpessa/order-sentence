@@ -1,19 +1,36 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
-import storage from 'redux-persist-indexeddb-storage';
+import createWebStorage from 'redux-persist/lib/storage/createWebStorage';
 
 import drugSearchReducer from './slices/drugSearchSlice';
 import excelDataReducer from './slices/excelDataSlice';
 import fdaDataReducer from './slices/fdaDataSlice';
 
-// We will import and add reducers here later
-// import drugSearchReducer from './slices/drugSearchSlice';
+// Create a noop storage for server-side rendering
+const createNoopStorage = () => {
+  return {
+    getItem(_key: string) {
+      return Promise.resolve(null);
+    },
+    setItem(_key: string, value: any) {
+      return Promise.resolve(value);
+    },
+    removeItem(_key: string) {
+      return Promise.resolve();
+    },
+  };
+};
+
+// Use localStorage on client, noop on server
+const storage = typeof window !== 'undefined' 
+  ? createWebStorage('local') 
+  : createNoopStorage();
 
 const persistConfig = {
   key: 'root',
   version: 1,
-  storage: storage({ name: 'orderSentenceAppDB' }), // Pass an object with the db name
-  whitelist: ['excelData', 'drugSearch', 'fdaData'], // Only persist the excelData slice
+  storage,
+  whitelist: ['excelData', 'drugSearch', 'fdaData'], // Only persist these slices
 };
 
 const rootReducer = combineReducers({

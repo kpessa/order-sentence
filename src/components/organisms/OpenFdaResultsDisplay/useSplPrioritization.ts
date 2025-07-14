@@ -8,19 +8,18 @@ import {
   selectCurrentDrugNameQuery,
   setPrioritizedSpls,
   fetchSplDetailFromDailyMed,
-  DailyMedSplDetailEntry,
-  PrioritizedSplsState,
+  DailyMedSplDetail,
 } from '@/lib/store/slices/fdaDataSlice';
 import { performSplPrioritization, ParsedSplProductData } from '@/lib/utils/splPrioritization';
 
 export function useSplPrioritization(openFdaResults: any, openFdaStatus: string) {
   const dispatch = useDispatch<AppDispatch>();
-  const dailyMedDetails: Record<string, DailyMedSplDetailEntry> = useSelector((state: RootState) => state.fdaData?.dailyMedDetails || {});
+  const dailyMedDetails: Record<string, { data?: DailyMedSplDetail; status: 'idle' | 'loading' | 'succeeded' | 'failed'; error?: string | null }> = useSelector((state: RootState) => state.fdaData?.dailyMedDetails || {});
   const [setIdsToPrioritize, setSetIdsToPrioritize] = useState<Set<string>>(new Set<string>());
   const [compiledDnaForPreview, setCompiledDnaForPreview] = useState<string | null>(null);
   const [showDnaPreviewModal, setShowDnaPreviewModal] = useState(false);
   const [isLoadingPrioritization, setIsLoadingPrioritization] = useState(false);
-  const prioritizedSpls = useSelector((state: RootState) => state.fdaData?.prioritizedSplsByDosageForm || {} as PrioritizedSplsState);
+  const prioritizedSpls = useSelector((state: RootState) => state.fdaData?.prioritizedSplsByDosageForm || {} as Record<string, ParsedSplProductData>);
 
   useEffect(() => {
     if (openFdaStatus === 'succeeded' && openFdaResults && openFdaResults.length > 0) {
@@ -52,7 +51,7 @@ export function useSplPrioritization(openFdaResults: any, openFdaStatus: string)
         const anyLoading = Array.from(setIdsToPrioritize).some(setId => dailyMedDetails[setId]?.status === 'loading');
         if (!anyLoading) {
           setIsLoadingPrioritization(true);
-          const successfullyFetchedSplDetails: Record<string, DailyMedSplDetailEntry> = {};
+          const successfullyFetchedSplDetails: Record<string, { data?: DailyMedSplDetail; status: 'idle' | 'loading' | 'succeeded' | 'failed'; error?: string | null }> = {};
           Array.from(setIdsToPrioritize).forEach(setId => {
             if (dailyMedDetails[setId]) {
               successfullyFetchedSplDetails[setId] = dailyMedDetails[setId]!;

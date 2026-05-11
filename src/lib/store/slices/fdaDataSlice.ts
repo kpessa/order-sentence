@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../index';
 import { ParsedSplProductData } from '../../utils/splPrioritization';
 import { API_ENDPOINTS, logApiCall, handleApiError } from '@/lib/config/api';
+import { ClinicalSummary } from '@/lib/services/aiSummaryService';
 
 // --- Interfaces based on your workflow ---
 interface RxNormNdcResponse {
@@ -132,6 +133,13 @@ interface FdaDataState {
   dailyMedSplListError: string | null | undefined;
 
   currentDrugNameQuery?: string; // To store the drug name used for the current FDA/DailyMed search
+
+  // AI Summary state
+  aiSummary: {
+    data: ClinicalSummary | null;
+    status: 'idle' | 'loading' | 'succeeded' | 'failed';
+    error: string | null;
+  };
 }
 
 const initialState: FdaDataState = {
@@ -147,6 +155,11 @@ const initialState: FdaDataState = {
   dailyMedSplListStatus: 'idle',
   dailyMedSplListError: null,
   currentDrugNameQuery: undefined,
+  aiSummary: {
+    data: null,
+    status: 'idle',
+    error: null,
+  },
 };
 
 // --- Async Thunks ---
@@ -645,7 +658,27 @@ const fdaDataSlice = createSlice({
     ) => {
       state.prioritizedSplsByDosageForm = action.payload;
     },
-    // We might also have a reducer that does the calculation directly if triggered by another action.
+    // AI Summary actions
+    setAISummaryLoading: (state) => {
+      state.aiSummary.status = 'loading';
+      state.aiSummary.error = null;
+    },
+    setAISummarySuccess: (state, action: PayloadAction<ClinicalSummary>) => {
+      state.aiSummary.status = 'succeeded';
+      state.aiSummary.data = action.payload;
+      state.aiSummary.error = null;
+    },
+    setAISummaryError: (state, action: PayloadAction<string>) => {
+      state.aiSummary.status = 'failed';
+      state.aiSummary.error = action.payload;
+    },
+    clearAISummary: (state) => {
+      state.aiSummary = {
+        data: null,
+        status: 'idle',
+        error: null,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -836,7 +869,14 @@ const fdaDataSlice = createSlice({
 });
 
 // --- Export Actions & Reducer ---
-export const { resetFdaState, setPrioritizedSpls } = fdaDataSlice.actions;
+export const { 
+  resetFdaState, 
+  setPrioritizedSpls,
+  setAISummaryLoading,
+  setAISummarySuccess,
+  setAISummaryError,
+  clearAISummary
+} = fdaDataSlice.actions;
 export default fdaDataSlice.reducer;
 
 // --- Selectors ---
@@ -865,6 +905,11 @@ export const selectDailyMedSplListError = (state: RootState) =>
   state.fdaData.dailyMedSplListError;
 export const selectCurrentDrugNameQuery = (state: RootState) =>
   state.fdaData.currentDrugNameQuery;
+
+// Selectors for AI Summary
+export const selectAISummary = (state: RootState) => state.fdaData.aiSummary.data;
+export const selectAISummaryStatus = (state: RootState) => state.fdaData.aiSummary.status;
+export const selectAISummaryError = (state: RootState) => state.fdaData.aiSummary.error;
 
 // Helper function for prioritization (can be moved to a separate file if it grows)
 // This is a placeholder for where the logic would go. Ideally, this is done via createSelector or a thunk.

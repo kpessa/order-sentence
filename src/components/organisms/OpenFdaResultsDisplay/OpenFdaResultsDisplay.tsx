@@ -17,6 +17,7 @@ import {
   fetchSplDetailFromDailyMed,
 } from '@/lib/store/slices/fdaDataSlice';
 import { performSplPrioritization } from '@/lib/utils/splPrioritization';
+import { ProductSelectionFilter } from '../ProductSelectionFilter';
 
 export function OpenFdaResultsDisplay() {
   const dispatch = useDispatch<AppDispatch>();
@@ -54,6 +55,10 @@ export function OpenFdaResultsDisplay() {
   >(null);
   const [showDnaPreviewModal, setShowDnaPreviewModal] =
     useState<boolean>(false);
+  
+  // State for product selection workflow
+  const [showProductFilter, setShowProductFilter] = useState<boolean>(true);
+  const [selectedProducts, setSelectedProducts] = useState<OpenFdaResult[]>([]);
 
   // Effect to trigger prioritization when all relevant dailyMedDetails are fetched
   useEffect(() => {
@@ -402,8 +407,9 @@ export function OpenFdaResultsDisplay() {
       // prioritizationDoneRef.current = false;
 
       const setIdsToFetch = new Set<string>();
-      if (openFdaResults && openFdaResults.length > 0) {
-        openFdaResults.forEach((result) => {
+      const resultsToProcess = showProductFilter ? openFdaResults : selectedProducts;
+      if (resultsToProcess && resultsToProcess.length > 0) {
+        resultsToProcess.forEach((result) => {
           if (result.openfda?.spl_set_id) {
             result.openfda.spl_set_id.forEach((setId) => {
               // Only fetch if not already fetched, loading, or failed recently (to avoid re-spamming on error)
@@ -455,25 +461,64 @@ export function OpenFdaResultsDisplay() {
       }
     };
 
+    // Handler for when products are selected in the filter
+    const handleProductsSelected = (products: OpenFdaResult[]) => {
+      setSelectedProducts(products);
+      setShowProductFilter(false);
+      console.log(`[OpenFdaResultsDisplay] User selected ${products.length} products for SPL fetching`);
+    };
+
+    // Handler to go back to product selection
+    const handleBackToSelection = () => {
+      setShowProductFilter(true);
+      setSelectedProducts([]);
+      // Clear any existing SPL data
+      dispatch(setPrioritizedSpls({}));
+      setCompiledDnaForPreview(null);
+    };
+
     return (
-      <div className="mt-6 p-4 border rounded-lg shadow bg-gray-50">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold text-gray-800">
-            OpenFDA Results for &apos;{currentDrugNameQuery}&apos;
-          </h3>
-          <button
-            onClick={handlePrioritizeSpls}
-            disabled={
-              dailyMedSplListStatus === 'loading' ||
-              Object.keys(dailyMedDetails).length === 0
-            }
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 transition-colors duration-150 text-sm"
-          >
-            {dailyMedSplListStatus === 'loading'
-              ? 'Fetching SPLs...'
-              : 'Prioritize SPLs'}
-          </button>
-        </div>
+      <div className="mt-6 space-y-4">
+        {/* Product Selection Filter */}
+        {showProductFilter ? (
+          <ProductSelectionFilter 
+            openFdaResults={openFdaResults}
+            onProductsSelected={handleProductsSelected}
+          />
+        ) : (
+          <>
+            {/* Traditional OpenFDA Results Display */}
+            <div className="p-4 border rounded-lg shadow bg-gray-50">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Selected Products for &apos;{currentDrugNameQuery}&apos;
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {selectedProducts.length} product{selectedProducts.length !== 1 ? 's' : ''} selected for analysis
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleBackToSelection}
+                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors duration-150 text-sm"
+                  >
+                    Change Selection
+                  </button>
+                  <button
+                    onClick={handlePrioritizeSpls}
+                    disabled={
+                      dailyMedSplListStatus === 'loading' ||
+                      Object.keys(dailyMedDetails).length === 0
+                    }
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-300 transition-colors duration-150 text-sm"
+                  >
+                    {dailyMedSplListStatus === 'loading'
+                      ? 'Fetching SPLs...'
+                      : 'Prioritize SPLs'}
+                  </button>
+                </div>
+              </div>
 
         {/* Timestamp of Data Retrieval */}
         {retrievalTimestamp && (
@@ -549,10 +594,13 @@ export function OpenFdaResultsDisplay() {
           </p>
         )}
 
-        {Object.entries(groupedResults).map(([dosageForm, resultsInGroup]) => {
-          const isExpanded = expandedDosageForms[dosageForm];
-          const itemsToShow = isExpanded ? resultsInGroup.length : 0; // Initially show 0 items
-          // const hasMore = resultsInGroup.length > 3; // No longer needed in this way
+        {/* Display selected products grouped by dosage form */}
+        {(() => {
+          const selectedGroupedResults = groupResultsByDosageForm(selectedProducts);
+          return Object.entries(selectedGroupedResults).map(([dosageForm, resultsInGroup]) => {
+            const isExpanded = expandedDosageForms[dosageForm];
+            const itemsToShow = isExpanded ? resultsInGroup.length : 0; // Initially show 0 items
+            // const hasMore = resultsInGroup.length > 3; // No longer needed in this way
 
           return (
             <div key={dosageForm} className="mb-8">
@@ -763,7 +811,8 @@ export function OpenFdaResultsDisplay() {
               )}
             </div>
           );
-        })}
+          });
+        })()}
 
         {/* Section for Prioritized SPLs - this can remain, but its trigger logic has changed */}
         {Object.keys(dailyMedDetails).length > 0 &&
@@ -832,6 +881,9 @@ export function OpenFdaResultsDisplay() {
               </button>
             </div>
           </div>
+        )}
+            </div>
+          </>
         )}
       </div>
     );

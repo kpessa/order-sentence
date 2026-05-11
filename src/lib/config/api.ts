@@ -23,6 +23,15 @@ export const API_CONFIG = {
       'https://dailymed.nlm.nih.gov/dailymed/services/v2',
     TIMEOUT: parseInt(process.env.API_TIMEOUT_DAILYMED || '20000'),
   },
+  ANTHROPIC: {
+    BASE_URL:
+      process.env.NEXT_PUBLIC_ANTHROPIC_API_BASE_URL ||
+      'https://api.anthropic.com',
+    TIMEOUT: parseInt(process.env.API_TIMEOUT_ANTHROPIC || '30000'),
+    API_KEY: process.env.ANTHROPIC_API_KEY || '',
+    MODEL: process.env.ANTHROPIC_MODEL || 'claude-3-haiku-20240307',
+    MAX_TOKENS: parseInt(process.env.ANTHROPIC_MAX_TOKENS || '1024'),
+  },
 } as const;
 
 // Application Configuration
@@ -73,6 +82,10 @@ export const API_ENDPOINTS = {
 
     SPL_XML: (setId: string) =>
       `${API_CONFIG.DAILYMED.BASE_URL}/spls/${setId}.xml`,
+  },
+
+  ANTHROPIC: {
+    MESSAGES: () => `${API_CONFIG.ANTHROPIC.BASE_URL}/v1/messages`,
   },
 } as const;
 

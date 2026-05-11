@@ -2,10 +2,9 @@
 
 import { useSelector } from 'react-redux';
 import { DrugAutocomplete } from '@/components/molecules/DrugAutocomplete';
-import { WorkflowSelector } from '@/components/molecules/WorkflowSelector';
 import { selectSelectedDrug } from '@/lib/store/slices/drugSearchSlice';
 import type { RootState } from '@/lib/store';
-import { OpenFdaResultsDisplay } from '@/components/organisms/OpenFdaResultsDisplay/OpenFdaResultsDisplay';
+import { DrugInformationPanel } from '@/components/organisms/DrugInformationPanel';
 import { RouteErrorBoundary } from '@/components/utility/RouteErrorBoundary';
 import { ApiErrorBoundary } from '@/components/utility/ApiErrorBoundary';
 
@@ -17,76 +16,29 @@ export default function HomePage() {
 
   return (
     <RouteErrorBoundary routeName="Home">
-      <main className="mx-auto p-4 md:p-8">
-        <header className="mb-10">
-          <h1 className="text-4xl font-bold mb-2 text-center text-gray-800">
-            Comprehensive Drug Analysis
+      <main className="mx-auto max-w-7xl p-3 md:p-6 lg:p-8">
+        <header className="text-center mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-3 text-gray-900">
+            Drug Information Center
           </h1>
-          <p className="text-lg text-gray-600 text-center">
-            Search for medications and explore detailed information workflows.
+          <p className="text-base md:text-xl text-gray-600 mb-6 md:mb-8 px-4">
+            Search for any medication and get comprehensive information instantly
           </p>
-        </header>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          <section
-            id="drug-search"
-            className="p-6 bg-white shadow-lg rounded-lg"
-          >
-            <h2 className="text-2xl font-semibold mb-5 text-blue-700 border-b pb-2">
-              Step 1: Drug Search & Selection
-            </h2>
+          
+          {/* Centered Search Bar */}
+          <div className="max-w-sm md:max-w-md mx-auto px-4">
             <ApiErrorBoundary apiName="RxNorm">
               <DrugAutocomplete />
             </ApiErrorBoundary>
-          </section>
+          </div>
+        </header>
 
-          <section
-            id="workflow-selection"
-            className={`p-6 bg-white shadow-lg rounded-lg ${!selectedDrug ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            <h2 className="text-2xl font-semibold mb-5 text-blue-700 border-b pb-2">
-              Step 2: Workflow Selection
-            </h2>
-            <WorkflowSelector selectedDrug={selectedDrug} />
-            {!selectedDrug && (
-              <p className="text-sm text-gray-500 mt-4">
-                Please select a drug to enable workflow options.
-              </p>
-            )}
-          </section>
-        </div>
-
-        {selectedDrug && (
-          <section
-            id="selected-drug-info"
-            className="mt-10 p-6 bg-gray-50 shadow-md rounded-lg"
-          >
-            <h3 className="text-xl font-semibold mb-3 text-gray-700">
-              Currently Selected Drug:
-            </h3>
-            <div className="text-gray-800">
-              <p>
-                <strong>Name:</strong> {selectedDrug.name}
-              </p>
-              <p>
-                <strong>RxCUI:</strong> {selectedDrug.rxcui}
-              </p>
-              <p>
-                <strong>Type:</strong> {selectedDrug.tty}{' '}
-                {selectedDrug.isIngredient ? '(Ingredient)' : ''}
-              </p>
-            </div>
-          </section>
-        )}
-
-        {/* Display OpenFDA results in its own full-width section */}
-        <section className="w-full mt-8">
-          <ApiErrorBoundary apiName="OpenFDA">
-            <OpenFdaResultsDisplay />
+        {/* Drug Information Panel */}
+        <div className="mt-6 md:mt-8">
+          <ApiErrorBoundary apiName="Drug Information">
+            <DrugInformationPanel selectedDrug={selectedDrug} />
           </ApiErrorBoundary>
-        </section>
-
-        {/* <DebugPanel /> */}
+        </div>
       </main>
     </RouteErrorBoundary>
   );

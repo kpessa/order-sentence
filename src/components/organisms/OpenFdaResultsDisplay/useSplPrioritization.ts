@@ -14,6 +14,10 @@ import {
   performSplPrioritization,
   ParsedSplProductData,
 } from '@/lib/utils/splPrioritization';
+import {
+  performEnhancedSplPrioritization,
+  type PrioritizationResult
+} from '@/lib/utils/enhancedSplPrioritization';
 
 export function useSplPrioritization(
   openFdaResults: any,
@@ -36,6 +40,7 @@ export function useSplPrioritization(
   >(null);
   const [showDnaPreviewModal, setShowDnaPreviewModal] = useState(false);
   const [isLoadingPrioritization, setIsLoadingPrioritization] = useState(false);
+  const [enhancedPrioritizationResult, setEnhancedPrioritizationResult] = useState<PrioritizationResult | null>(null);
   const prioritizedSpls = useSelector(
     (state: RootState) =>
       state.fdaData?.prioritizedSplsByDosageForm ||
@@ -102,16 +107,24 @@ export function useSplPrioritization(
             }
           });
           if (Object.keys(successfullyFetchedSplDetails).length > 0) {
-            performSplPrioritization(successfullyFetchedSplDetails)
-              .then((newPrioritizedSpls) => {
-                dispatch(setPrioritizedSpls(newPrioritizedSpls));
+            // Run both legacy and enhanced prioritization
+            Promise.all([
+              performSplPrioritization(successfullyFetchedSplDetails),
+              performEnhancedSplPrioritization(successfullyFetchedSplDetails)
+            ])
+              .then(([legacyResult, enhancedResult]) => {
+                dispatch(setPrioritizedSpls(legacyResult));
+                setEnhancedPrioritizationResult(enhancedResult);
               })
-              .catch(() => {})
+              .catch((error) => {
+                console.error('[useSplPrioritization] Error in prioritization:', error);
+              })
               .finally(() => {
                 setIsLoadingPrioritization(false);
               });
           } else {
             dispatch(setPrioritizedSpls({}));
+            setEnhancedPrioritizationResult(null);
             setIsLoadingPrioritization(false);
           }
         }
@@ -197,6 +210,7 @@ export function useSplPrioritization(
     setShowDnaPreviewModal,
     isLoadingPrioritization,
     prioritizedSpls,
+    enhancedPrioritizationResult,
     dailyMedDetails,
     handleManualFetchAndPrioritize,
   };
